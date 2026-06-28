@@ -21,6 +21,7 @@
 
     @media(max-width:760px){.work{width:clamp(185px,56vw,285px)}.project-info{bottom:88px;gap:10px}.current-title{font-size:clamp(32px,13vw,58px)}.current-note{max-width:280px;font-size:12px}.controls{left:8px;right:8px;justify-content:space-between}.mode-button{flex:1}.detail-grid{grid-template-columns:1fr}.admin-file-row{gap:6px}}@media(prefers-reduced-motion:reduce){.work,.index-panel,.about-panel,.icon-button,.mode-button,.project-detail,.admin-panel,.admin-modal,.lightbox,.admin-file-row{transition:none}}
   </style>
+<base target="_blank">
 </head>
 <body>
   <main class="site" aria-label="Portfolio carousel">
@@ -208,6 +209,31 @@
           URL.revokeObjectURL(url);
         };
         img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Image load failed'));};
+      });
+    }
+    /* Generate poster frame from video file */
+    function generateVideoPoster(file,maxWidth=800,quality=0.82){
+      return new Promise((resolve,reject)=>{
+        const video=document.createElement('video');
+        video.muted=true;
+        video.playsInline=true;
+        video.preload='auto';
+        const url=URL.createObjectURL(file);
+        video.src=url;
+        video.addEventListener('loadeddata',()=>{video.currentTime=0.1;});
+        video.addEventListener('seeked',()=>{
+          const canvas=document.createElement('canvas');
+          const ctx=canvas.getContext('2d');
+          let w=video.videoWidth,h=video.videoHeight;
+          if(w>maxWidth){h=Math.round((maxWidth/w)*h);w=maxWidth;}
+          if(w===0||h===0){URL.revokeObjectURL(url);reject(new Error('Invalid video dimensions'));return;}
+          canvas.width=w;canvas.height=h;
+          ctx.fillStyle='#dedbd2';ctx.fillRect(0,0,w,h);
+          ctx.drawImage(video,0,0,w,h);
+          resolve(canvas.toDataURL('image/jpeg',quality));
+          URL.revokeObjectURL(url);
+        });
+        video.addEventListener('error',()=>{URL.revokeObjectURL(url);reject(new Error('Video load failed'));});
         img.src=url;
       });
     }
@@ -228,19 +254,23 @@
     function thumbMedia(p){
       const f=p.files&&p.files[0];
       if(!f)return '<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="">';
-      if(isVideo(f))return '<video src="'+f.url+'" muted loop autoplay playsinline style="width:100%;height:100%;object-fit:cover;"></video>';
+      if(isVideo(f)){
+        const poster=f.poster?' poster="'+f.poster+'"':'';
+        return '<video src="'+f.url+'"'+poster+' muted loop autoplay playsinline preload="auto" disablePictureInPicture style="width:100%;height:100%;object-fit:cover;background:#111;"></video>';
+      }
       return '<img src="'+f.url+'" alt="'+p.title+'">';
     }
     function thumbUrl(p){
       const f=p.files&&p.files[0];
       if(!f)return 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+      if(isVideo(f)&&f.poster)return f.poster;
       return f.url;
     }
 
     /* Rendering */
     function render(){
       carousel.innerHTML=projects.map((p,i)=>'<article class="work" data-index="'+i+'">'+thumbMedia(p)+'<div class="work-meta"><h2 class="work-title">'+p.title+'</h2><p class="work-detail"><span>'+p.tags+'</span><span>'+p.description.substring(0,18)+'...</span></p></div></article>').join('');
-      indexPanel.innerHTML=projects.map((p,i)=>'<button class="index-row" type="button" data-index="'+i+'" aria-current="false">'+(isVideo(p.files&&p.files[0])?'<video class="index-thumb" src="'+thumbUrl(p)+'" muted loop autoplay playsinline></video>':'<img class="index-thumb" src="'+thumbUrl(p)+'" alt="">')+'<span>'+p.title+'<br><span style="color:var(--muted)">'+p.tags+'</span></span><span>'+p.description.substring(0,12)+'...</span></button>').join('');
+      indexPanel.innerHTML=projects.map((p,i)=>'<button class="index-row" type="button" data-index="'+i+'" aria-current="false">'+(isVideo(p.files&&p.files[0])?'<video class="index-thumb" src="'+thumbUrl(p)+'" muted loop autoplay playsinline preload="auto" disablePictureInPicture></video>':'<img class="index-thumb" src="'+thumbUrl(p)+'" alt="">')+'<span>'+p.title+'<br><span style="color:var(--muted)">'+p.tags+'</span></span><span>'+p.description.substring(0,12)+'...</span></button>').join('');
       carousel.querySelectorAll('.work').forEach(c=>c.addEventListener('click',()=>openDetail(Number(c.dataset.index))));
       indexPanel.querySelectorAll('.index-row').forEach(r=>r.addEventListener('click',()=>{goTo(Number(r.dataset.index));setIndex(false)}));
       update();
@@ -358,8 +388,9 @@
       if(!file||!pendingUpload)return;
       const isVideo=file.type.startsWith('video/');
       const projIdx=pendingUpload.projIdx;
-      const process=(dataUrl,type)=>{
+      const process=(dataUrl,type,poster)=>{
         const payload={url:dataUrl,caption:'',type:type};
+        if(poster)payload.poster=poster;
         if(pendingUpload.action==='new'){
           projects[projIdx].files.push(payload);
         }else{
@@ -372,7 +403,16 @@
       };
       if(isVideo){
         const reader=new FileReader();
-        reader.onload=(ev)=>process(ev.target.result,'video');
+        reader.onload=(ev)=>{
+          const videoUrl=ev.target.result;
+          // Generate poster frame from video
+          generateVideoPoster(file).then(poster=>{
+            process(videoUrl,'video',poster);
+          }).catch(err=>{
+            console.warn('Poster generation failed, using video without poster:',err);
+            process(videoUrl,'video');
+          });
+        };
         reader.onerror=()=>{alert('Video read failed');pendingUpload=null;createFileInput();};
         reader.readAsDataURL(file);
       }else{
@@ -416,7 +456,7 @@
       adminContent.innerHTML=projects.map((p,i)=>{
         const filesHtml=(p.files||[]).map((f,fi)=>{
           const type=getFileType(f);
-          const thumb=type==='video'?'<video class="admin-thumb" src="'+f.url+'" muted></video>':'<img class="admin-thumb" src="'+f.url+'">';
+          const thumb=type==='video'?(f.poster?'<img class="admin-thumb" src="'+f.poster+'">':'<video class="admin-thumb" src="'+f.url+'" muted></video>'):'<img class="admin-thumb" src="'+f.url+'">';
           return '<div class="admin-file-row" draggable="true" data-proj="'+i+'" data-fileindex="'+fi+'"><span class="drag-handle">&#9776;</span>'+thumb+'<input type="text" data-proj="'+i+'" data-file="'+fi+'" data-field="url" value="'+f.url+'" placeholder="Image URL or base64"><button type="button" class="upload-btn upload-replace" data-proj="'+i+'" data-file="'+fi+'">Upload</button><input type="text" data-proj="'+i+'" data-file="'+fi+'" data-field="caption" value="'+(f.caption||'')+'" placeholder="Caption"><button type="button" class="remove-file" data-proj="'+i+'" data-file="'+fi+'">Remove</button></div>';
         }).join('');
         return '<div class="admin-card" data-index="'+i+'"><div class="admin-field"><label>Title</label><input type="text" data-proj="'+i+'" data-field="title" value="'+p.title+'"></div><div class="admin-field"><label>Description</label><textarea data-proj="'+i+'" data-field="description">'+(p.description||'')+'</textarea></div><div class="admin-field"><label>Tags</label><input type="text" data-proj="'+i+'" data-field="tags" value="'+(p.tags||'')+'"></div><div class="admin-field"><label>Project Link</label><input type="text" data-proj="'+i+'" data-field="projectLink" value="'+(p.projectLink||'')+'"></div><div class="admin-field"><label>Note</label><textarea data-proj="'+i+'" data-field="note">'+(p.note||'')+'</textarea></div><label style="font-size:10px;text-transform:uppercase;color:var(--muted);letter-spacing:.04em;">Files (drag to reorder)</label><div class="admin-files" id="files-'+i+'">'+filesHtml+'</div><div class="admin-actions"><button type="button" class="upload-btn upload-new" data-proj="'+i+'">Upload Image / Video</button><button type="button" class="add-file" data-proj="'+i+'">+ Add URL</button><button type="button" class="primary save-proj" data-proj="'+i+'">Save Project</button><button type="button" class="danger delete-proj" data-proj="'+i+'">Delete Project</button></div></div>';
