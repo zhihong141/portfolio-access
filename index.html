@@ -19,8 +19,12 @@
     /* Admin Panel */
     .admin-panel{position:fixed;inset:0;z-index:90;background:var(--paper);overflow-y:auto;transform:translateX(100%);transition:transform .4s cubic-bezier(.2,.8,.2,1)}.admin-panel.is-open{transform:translateX(0)}.admin-header{position:sticky;top:0;background:var(--paper);border-bottom:1px solid var(--line);padding:16px clamp(12px,2vw,28px);display:flex;justify-content:space-between;align-items:center;z-index:2;gap:12px}.admin-content{padding:20px clamp(12px,2vw,28px);max-width:960px;margin:0 auto}.admin-card{border:1px solid var(--line);border-radius:6px;padding:18px;margin-bottom:16px;background:rgba(17,17,15,.02)}.admin-field{display:grid;gap:4px;margin-bottom:10px}.admin-field label{font-size:10px;text-transform:uppercase;color:var(--muted);letter-spacing:.04em}.admin-field input,.admin-field textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:transparent;font:inherit;font-size:13px}.admin-field textarea{resize:vertical;min-height:60px}.admin-files{display:grid;gap:8px;margin:12px 0}.admin-file-row{display:flex;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:4px;background:rgba(17,17,15,.02);cursor:move;transition:background .15s,transform .15s,box-shadow .15s}.admin-file-row.dragging{opacity:.5;background:rgba(17,17,15,.06)}.admin-file-row.over{border-color:var(--ink);background:rgba(17,17,15,.06)}.admin-file-row .drag-handle{width:20px;height:20px;display:grid;place-items:center;color:var(--muted);cursor:grab;font-size:14px;flex-shrink:0}.admin-file-row input{flex:1;min-width:80px}.admin-thumb{width:40px;height:40px;object-fit:cover;border-radius:3px;border:1px solid var(--line);background:#dedbd2;flex-shrink:0}.admin-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}.admin-actions button{padding:8px 14px;border:1px solid var(--line);border-radius:4px;background:transparent;font:inherit;font-size:11px;text-transform:uppercase;cursor:pointer;letter-spacing:.02em}.admin-actions button.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}.admin-actions button.danger{background:#b42318;color:#fff;border-color:#b42318}.admin-trigger{position:fixed;bottom:68px;right:8px;z-index:30;padding:6px 10px;font-size:10px;text-transform:uppercase;color:var(--muted);background:transparent;border:0;cursor:pointer;opacity:.4;transition:opacity .2s}.admin-trigger:hover{opacity:1;color:var(--ink)}.upload-btn{font-size:10px;text-transform:uppercase;letter-spacing:.02em;padding:6px 10px;border:1px solid var(--line);border-radius:4px;background:rgba(17,17,15,.04);cursor:pointer;white-space:nowrap}
 
+    /* Debug panel */
+    .debug-panel{position:fixed;top:8px;left:8px;z-index:200;background:rgba(0,0,0,.85);color:#0f0;font-family:monospace;font-size:11px;padding:12px;border-radius:4px;max-width:400px;max-height:200px;overflow:auto;opacity:0;pointer-events:none;transition:opacity .2s}.debug-panel.is-open{opacity:1;pointer-events:auto}
+
     @media(max-width:760px){.work{width:clamp(185px,56vw,285px)}.project-info{bottom:88px;gap:10px}.current-title{font-size:clamp(32px,13vw,58px)}.current-note{max-width:280px;font-size:12px}.controls{left:8px;right:8px;justify-content:space-between}.mode-button{flex:1}.detail-grid{grid-template-columns:1fr}.admin-file-row{gap:6px}}@media(prefers-reduced-motion:reduce){.work,.index-panel,.about-panel,.icon-button,.mode-button,.project-detail,.admin-panel,.admin-modal,.lightbox,.admin-file-row{transition:none}}
   </style>
+<base target="_blank">
 </head>
 <body>
   <main class="site" aria-label="Portfolio carousel">
@@ -30,6 +34,10 @@
     <aside class="index-panel" id="indexPanel" aria-label="Project index"></aside>
     <div class="controls" aria-label="Carousel controls"><button class="icon-button" type="button" id="prevButton" aria-label="Previous project" title="Previous project">&larr;</button><button class="mode-button" type="button" id="overviewButton" aria-pressed="true">Overview</button><button class="mode-button" type="button" id="indexButton" aria-pressed="false">Index</button><button class="icon-button" type="button" id="nextButton" aria-label="Next project" title="Next project">&rarr;</button></div>
   </main>
+
+  <!-- Debug Panel -->
+  <div class="debug-panel" id="debugPanel"></div>
+  <button style="position:fixed;top:8px;right:8px;z-index:201;font-size:10px;padding:4px 8px;background:rgba(0,0,0,.7);color:#0f0;border:0;border-radius:3px;cursor:pointer;" id="debugToggle" type="button">Debug</button>
 
   <!-- Admin Trigger -->
   <button class="admin-trigger" id="adminTrigger" type="button">Admin</button>
@@ -86,6 +94,21 @@
   </div>
 
   <script>
+    /* ==================== DEBUG LOGGER ==================== */
+    const debugPanel = document.querySelector('#debugPanel');
+    const debugLogs = [];
+    function log(msg) {
+      const line = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+      debugLogs.push(line);
+      if(debugLogs.length > 50) debugLogs.shift();
+      debugPanel.innerHTML = debugLogs.join('<br>');
+      console.log(line);
+    }
+    document.querySelector('#debugToggle').addEventListener('click', () => {
+      debugPanel.classList.toggle('is-open');
+    });
+    /* ==================== END DEBUG ==================== */
+
     const DEFAULT_PROJECTS = [
       {
         title: "Groceries",
@@ -173,19 +196,36 @@
       return input;
     }
 
-    /* Persistence */
+    /* ==================== FIXED: Persistence with version check ==================== */
+    const STORAGE_KEY = 'portfolio_projects_v10';  // Bumped version to force refresh
+    const DEFAULTS_HASH = DEFAULT_PROJECTS.map(p => p.title).join('|');
+
     function loadProjects(){
-      const raw=localStorage.getItem('portfolio_projects_v9');
-      if(raw){
-        try{projects=JSON.parse(raw);}catch(e){projects=structuredClone(DEFAULT_PROJECTS);}
-      }else{
+      const raw=localStorage.getItem(STORAGE_KEY);
+      const savedHash=localStorage.getItem(STORAGE_KEY + '_hash');
+
+      // If no saved data, or DEFAULT_PROJECTS changed, use defaults
+      if(!raw || savedHash !== DEFAULTS_HASH){
+        log('Using DEFAULT_PROJECTS (localStorage missing or stale)');
         projects=structuredClone(DEFAULT_PROJECTS);
         saveProjects();
+      }else{
+        try{
+          projects=JSON.parse(raw);
+          log('Loaded ' + projects.length + ' projects from localStorage');
+        }catch(e){
+          log('localStorage parse failed, using defaults');
+          projects=structuredClone(DEFAULT_PROJECTS);
+          saveProjects();
+        }
       }
     }
     function saveProjects(){
-      localStorage.setItem('portfolio_projects_v9',JSON.stringify(projects));
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(projects));
+      localStorage.setItem(STORAGE_KEY + '_hash', DEFAULTS_HASH);
+      log('Saved ' + projects.length + ' projects to localStorage');
     }
+    /* ==================== END FIX ==================== */
 
     /* Image resize -> base64 */
     function resizeImage(file,maxWidth=1400,quality=0.82){
@@ -238,18 +278,25 @@
     function pad(v){return String(v).padStart(2,"0")}
     function shortestOffset(i){const t=projects.length;let o=i-active;if(o>t/2)o-=t;if(o<-t/2)o+=t;return o}
     function coverUrl(p){return p.files&&p.files[0]?p.files[0].url:'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';}
+
+    /* ==================== FIXED: getFileType handles base64 data URLs ==================== */
     function getFileType(f){
-      if(f&&f.type)return f.type;
-      const ext=(f.url||'').split('.').pop().toLowerCase();
+      if(!f)return 'image';
+      if(f.type)return f.type;
+      const url=f.url||'';
+      if(url.startsWith('data:video/'))return 'video';
+      if(url.startsWith('data:image/'))return 'image';
+      const ext=url.split('.').pop().toLowerCase();
       if(['mp4','webm','mov','mkv','avi','m4v'].includes(ext))return 'video';
       return 'image';
     }
     function isVideo(f){return getFileType(f)==='video';}
+    /* ==================== END FIX ==================== */
 
     /* Dark video placeholder SVG (base64) */
     const VIDEO_PLACEHOLDER = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTIiIGhlaWdodD0iNTIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjUyIiBoZWlnaHQ9IjUyIiBmaWxsPSIjMTExIi8+PHBhdGggZD0iTTE4IDE2bDIwIDEwLTIwIDEweiIgZmlsbD0iIzMzMyIvPjwvc3ZnPg==';
 
-    /* ==================== FIXED: Build carousel cards with DOM API instead of innerHTML for videos ==================== */
+    /* ==================== FIXED: Build carousel cards with DOM API + error handling ==================== */
     function buildWorkCard(p, i){
       const article = document.createElement('article');
       article.className = 'work';
@@ -263,7 +310,7 @@
         const video = document.createElement('video');
         video.src = f.url;
         if(f.poster) video.poster = f.poster;
-        video.muted = true;        // MUST set via JS property, not just attribute
+        video.muted = true;
         video.loop = true;
         video.autoplay = true;
         video.playsInline = true;
@@ -271,13 +318,26 @@
         video.disablePictureInPicture = true;
         video.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
 
-        // Chrome requires explicit muted property + play() call
+        // Log video status for debugging
+        log('Project ' + i + ' (' + p.title + '): video src=' + f.url.substring(0,60) + '...');
+
         video.addEventListener('loadeddata', function(){
+          log('Project ' + i + ' (' + p.title + '): video loadeddata');
           this.muted = true;
-          this.play().catch(e => console.log('Autoplay prevented:', e));
+          this.play().catch(e => log('Autoplay prevented for ' + p.title + ': ' + e));
         });
+
         video.addEventListener('error', function(e){
-          console.error('Video failed to load:', f.url, e);
+          const err = this.error;
+          const code = err ? err.code : 'unknown';
+          const msg = err ? (err.message || 'code:'+code) : 'no error object';
+          log('VIDEO ERROR ' + p.title + ': ' + msg + ' (code=' + code + ')');
+          // Show error indicator
+          this.style.display = 'none';
+          const errDiv = document.createElement('div');
+          errDiv.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;text-transform:uppercase;letter-spacing:.05em;';
+          errDiv.textContent = 'Video Error';
+          wrapper.appendChild(errDiv);
         });
 
         const badge = document.createElement('span');
@@ -291,6 +351,7 @@
         const img = document.createElement('img');
         img.src = f.url;
         img.alt = p.title;
+        img.addEventListener('error', () => log('IMAGE ERROR ' + p.title + ': failed to load ' + f.url));
         article.appendChild(img);
       }else{
         const img = document.createElement('img');
@@ -319,15 +380,14 @@
       return f.url;
     }
 
-    /* Rendering - FIXED to use DOM API for carousel */
+    /* Rendering */
     function render(){
-      // Build carousel with DOM API (not innerHTML) so video elements work properly
+      log('render() called, projects=' + projects.length);
       carousel.innerHTML = '';
       projects.forEach((p, i) => {
         carousel.appendChild(buildWorkCard(p, i));
       });
 
-      // Index panel can still use innerHTML since it uses img tags
       indexPanel.innerHTML=projects.map((p,i)=>{
         const f=p.files&&p.files[0];
         let thumbHtml;
@@ -458,48 +518,56 @@
     function handleFileChange(e){
       const file=e.target.files&&e.target.files[0];
       if(!file||!pendingUpload)return;
+      log('Uploading file: ' + file.name + ' (' + file.type + ') for project ' + pendingUpload.projIdx);
       const isVideo=file.type.startsWith('video/');
       const projIdx=pendingUpload.projIdx;
       const process=(dataUrl,type,poster)=>{
         const payload={url:dataUrl,caption:'',type:type};
         if(poster)payload.poster=poster;
 
-        /* FIX: If project only has a placeholder, replace it instead of appending */
         const projFiles = projects[projIdx].files;
         const isOnlyPlaceholder = projFiles.length === 1 && projFiles[0].url === 'img/placeholder.jpg';
 
         if(pendingUpload.action==='new'){
           if(isOnlyPlaceholder){
-            projects[projIdx].files = [payload];  // Replace placeholder
+            projects[projIdx].files = [payload];
+            log('Replaced placeholder with new ' + type);
           }else{
-            projects[projIdx].files.push(payload);  // Append to existing real files
+            projects[projIdx].files.push(payload);
+            log('Appended new ' + type + ' to existing files');
           }
         }else{
           const oldCap=projects[projIdx].files[pendingUpload.fileIdx].caption||'';
           projects[projIdx].files[pendingUpload.fileIdx]={...payload,caption:oldCap};
+          log('Replaced file at index ' + pendingUpload.fileIdx);
         }
 
         saveProjects();renderAdmin();render();update();
         pendingUpload=null;
-        createFileInput(); // fresh input for next time
+        createFileInput();
       };
 
       if(isVideo){
         const reader=new FileReader();
         reader.onload=(ev)=>{
           const videoUrl=ev.target.result;
+          log('Video read complete, generating poster...');
           generateVideoPoster(file).then(poster=>{
+            log('Poster generated');
             process(videoUrl,'video',poster);
           }).catch(err=>{
-            console.warn('Poster generation failed, using video without poster:',err);
+            log('Poster generation failed: ' + err.message);
             process(videoUrl,'video');
           });
         };
-        reader.onerror=()=>{alert('Video read failed');pendingUpload=null;createFileInput();};
+        reader.onerror=()=>{log('Video read failed');alert('Video read failed');pendingUpload=null;createFileInput();};
         reader.readAsDataURL(file);
       }else{
-        resizeImage(file).then(dataUrl=>process(dataUrl,'image')).catch(err=>{
-          console.error(err);
+        resizeImage(file).then(dataUrl=>{
+          log('Image processed');
+          process(dataUrl,'image');
+        }).catch(err=>{
+          log('Image processing failed: ' + err.message);
           alert('Image processing failed: '+err.message);
           pendingUpload=null;createFileInput();
         });
@@ -664,7 +732,7 @@
     window.addEventListener('resize',update);
 
     /* Init */
-    createFileInput(); // ensure input exists
+    createFileInput();
     loadProjects();
     render();
   </script>
