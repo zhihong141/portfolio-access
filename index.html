@@ -98,6 +98,31 @@
           { url: "img/groceries_01.png", caption: "001", type: "image" },
           { url: "img/groceries_02.png", caption: "002", type: "image" }
         ]
+      },
+      {
+        title: "GENEA",
+        description: "2025-2026",
+        tags: "Scifi",
+        projectLink: "https://www.artstation.com/sevenfour_heavenfall/albums/14156663",
+        note: "Insionis Extraction Corporation",
+        files: [
+          { url: "video/Genea_001.mp4", caption: "001", type: "video" },
+          { url: "video/Genea_002.mp4", caption: "002", type: "video" },
+          { url: "video/Genea_003.mp4", caption: "003", type: "video" }
+        ]
+      },
+      {
+        title: "LOADING SCREEN",
+        description: "2025-2026",
+        tags: "animation",
+        projectLink: "https://www.artstation.com/sevenfour_heavenfall/albums/14156667",
+        note: "concept art of video game loading screen",
+        files: [
+          { url: "video/loading_001.mp4", caption: "001", type: "video" },
+          { url: "video/loading_002.mp4", caption: "002", type: "video" },
+          { url: "video/loading_003.mp4", caption: "003", type: "video" },
+          { url: "video/loading_004.mp4", caption: "004", type: "video" }
+        ]
       }
     ];
 
@@ -231,7 +256,6 @@
       if(!f)return '<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="">';
       if(isVideo(f)){
         const poster=f.poster?' poster="'+f.poster+'"':'';
-        // Use src attribute directly (not <source> tag) for better autoplay compatibility
         return '<div style="position:relative;width:100%;height:100%;background:#111;">'+
           '<video src="'+f.url+'"'+poster+' muted loop autoplay playsinline preload="auto" disablePictureInPicture '+
           'style="width:100%;height:100%;object-fit:cover;display:block;" '+
@@ -242,7 +266,7 @@
       return '<img src="'+f.url+'" alt="'+p.title+'">';
     }
 
-    /* Thumbnail URL - FIXED: returns dark placeholder for videos instead of transparent pixel */
+    /* Thumbnail URL - FIXED */
     function thumbUrl(p){
       const f=p.files&&p.files[0];
       if(!f)return 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -257,7 +281,6 @@
     function render(){
       carousel.innerHTML=projects.map((p,i)=>'<article class="work" data-index="'+i+'">'+thumbMedia(p)+'<div class="work-meta"><h2 class="work-title">'+p.title+'</h2><p class="work-detail"><span>'+p.tags+'</span><span>'+p.description.substring(0,18)+'...</span></p></div></article>').join('');
 
-      // FIXED index panel: proper video thumbnail handling
       indexPanel.innerHTML=projects.map((p,i)=>{
         const f=p.files&&p.files[0];
         let thumbHtml;
@@ -385,6 +408,7 @@
     }
     function exitAdmin(){isAdmin=false;adminPanel.classList.remove('is-open');adminPanel.setAttribute('aria-hidden','true');}
 
+    /* ==================== FIXED: handleFileChange ==================== */
     function handleFileChange(e){
       const file=e.target.files&&e.target.files[0];
       if(!file||!pendingUpload)return;
@@ -393,16 +417,27 @@
       const process=(dataUrl,type,poster)=>{
         const payload={url:dataUrl,caption:'',type:type};
         if(poster)payload.poster=poster;
+
+        /* FIX: If project only has a placeholder, replace it instead of appending */
+        const projFiles = projects[projIdx].files;
+        const isOnlyPlaceholder = projFiles.length === 1 && projFiles[0].url === 'img/placeholder.jpg';
+
         if(pendingUpload.action==='new'){
-          projects[projIdx].files.push(payload);
+          if(isOnlyPlaceholder){
+            projects[projIdx].files = [payload];  // Replace placeholder
+          }else{
+            projects[projIdx].files.push(payload);  // Append to existing real files
+          }
         }else{
           const oldCap=projects[projIdx].files[pendingUpload.fileIdx].caption||'';
           projects[projIdx].files[pendingUpload.fileIdx]={...payload,caption:oldCap};
         }
+
         saveProjects();renderAdmin();render();update();
         pendingUpload=null;
         createFileInput(); // fresh input for next time
       };
+
       if(isVideo){
         const reader=new FileReader();
         reader.onload=(ev)=>{
@@ -424,6 +459,7 @@
         });
       }
     }
+    /* ==================== END FIX ==================== */
 
     /* Drag and drop reorder */
     function handleDragStart(e){
