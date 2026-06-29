@@ -21,7 +21,6 @@
 
     @media(max-width:760px){.work{width:clamp(185px,56vw,285px)}.project-info{bottom:88px;gap:10px}.current-title{font-size:clamp(32px,13vw,58px)}.current-note{max-width:280px;font-size:12px}.controls{left:8px;right:8px;justify-content:space-between}.mode-button{flex:1}.detail-grid{grid-template-columns:1fr}.admin-file-row{gap:6px}}@media(prefers-reduced-motion:reduce){.work,.index-panel,.about-panel,.icon-button,.mode-button,.project-detail,.admin-panel,.admin-modal,.lightbox,.admin-file-row{transition:none}}
   </style>
-<base target="_blank">
 </head>
 <body>
   <main class="site" aria-label="Portfolio carousel">
@@ -250,23 +249,66 @@
     /* Dark video placeholder SVG (base64) */
     const VIDEO_PLACEHOLDER = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTIiIGhlaWdodD0iNTIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjUyIiBoZWlnaHQ9IjUyIiBmaWxsPSIjMTExIi8+PHBhdGggZD0iTTE4IDE2bDIwIDEwLTIwIDEweiIgZmlsbD0iIzMzMyIvPjwvc3ZnPg==';
 
-    /* Thumbnail media builder - FIXED */
-    function thumbMedia(p){
-      const f=p.files&&p.files[0];
-      if(!f)return '<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="">';
-      if(isVideo(f)){
-        const poster=f.poster?' poster="'+f.poster+'"':'';
-        return '<div style="position:relative;width:100%;height:100%;background:#111;">'+
-          '<video src="'+f.url+'"'+poster+' muted loop autoplay playsinline preload="auto" disablePictureInPicture '+
-          'style="width:100%;height:100%;object-fit:cover;display:block;" '+
-          'onloadeddata="this.play().catch(()=>{})"></video>'+
-          '<span style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;text-transform:uppercase;letter-spacing:.06em;padding:4px 8px;border-radius:3px;pointer-events:none;z-index:3;">Video</span>'+
-          '</div>';
-      }
-      return '<img src="'+f.url+'" alt="'+p.title+'">';
-    }
+    /* ==================== FIXED: Build carousel cards with DOM API instead of innerHTML for videos ==================== */
+    function buildWorkCard(p, i){
+      const article = document.createElement('article');
+      article.className = 'work';
+      article.dataset.index = i;
 
-    /* Thumbnail URL - FIXED */
+      const f = p.files && p.files[0];
+      if(f && isVideo(f)){
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = 'position:relative;width:100%;height:100%;background:#111;';
+
+        const video = document.createElement('video');
+        video.src = f.url;
+        if(f.poster) video.poster = f.poster;
+        video.muted = true;        // MUST set via JS property, not just attribute
+        video.loop = true;
+        video.autoplay = true;
+        video.playsInline = true;
+        video.preload = 'auto';
+        video.disablePictureInPicture = true;
+        video.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+
+        // Chrome requires explicit muted property + play() call
+        video.addEventListener('loadeddata', function(){
+          this.muted = true;
+          this.play().catch(e => console.log('Autoplay prevented:', e));
+        });
+        video.addEventListener('error', function(e){
+          console.error('Video failed to load:', f.url, e);
+        });
+
+        const badge = document.createElement('span');
+        badge.textContent = 'Video';
+        badge.style.cssText = 'position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;text-transform:uppercase;letter-spacing:.06em;padding:4px 8px;border-radius:3px;pointer-events:none;z-index:3;';
+
+        wrapper.appendChild(video);
+        wrapper.appendChild(badge);
+        article.appendChild(wrapper);
+      }else if(f){
+        const img = document.createElement('img');
+        img.src = f.url;
+        img.alt = p.title;
+        article.appendChild(img);
+      }else{
+        const img = document.createElement('img');
+        img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+        article.appendChild(img);
+      }
+
+      const meta = document.createElement('div');
+      meta.className = 'work-meta';
+      meta.innerHTML = '<h2 class="work-title">'+p.title+'</h2><p class="work-detail"><span>'+p.tags+'</span><span>'+p.description.substring(0,18)+'...</span></p>';
+      article.appendChild(meta);
+
+      article.addEventListener('click', () => openDetail(i));
+      return article;
+    }
+    /* ==================== END FIX ==================== */
+
+    /* Thumbnail URL for index panel */
     function thumbUrl(p){
       const f=p.files&&p.files[0];
       if(!f)return 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -277,10 +319,15 @@
       return f.url;
     }
 
-    /* Rendering */
+    /* Rendering - FIXED to use DOM API for carousel */
     function render(){
-      carousel.innerHTML=projects.map((p,i)=>'<article class="work" data-index="'+i+'">'+thumbMedia(p)+'<div class="work-meta"><h2 class="work-title">'+p.title+'</h2><p class="work-detail"><span>'+p.tags+'</span><span>'+p.description.substring(0,18)+'...</span></p></div></article>').join('');
+      // Build carousel with DOM API (not innerHTML) so video elements work properly
+      carousel.innerHTML = '';
+      projects.forEach((p, i) => {
+        carousel.appendChild(buildWorkCard(p, i));
+      });
 
+      // Index panel can still use innerHTML since it uses img tags
       indexPanel.innerHTML=projects.map((p,i)=>{
         const f=p.files&&p.files[0];
         let thumbHtml;
@@ -296,7 +343,6 @@
         return '<button class="index-row" type="button" data-index="'+i+'" aria-current="false">'+thumbHtml+'<span>'+p.title+'<br><span style="color:var(--muted)">'+p.tags+'</span></span><span>'+p.description.substring(0,12)+'...</span></button>';
       }).join('');
 
-      carousel.querySelectorAll('.work').forEach(c=>c.addEventListener('click',()=>openDetail(Number(c.dataset.index))));
       indexPanel.querySelectorAll('.index-row').forEach(r=>r.addEventListener('click',()=>{goTo(Number(r.dataset.index));setIndex(false)}));
       update();
     }
