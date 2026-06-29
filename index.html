@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Studio Portfolio Carousel</title>
   <style>
-    :root{--paper:#f7f7f3;--ink:#11110f;--muted:#77756e;--line:rgba(17,17,15,.16);--glass:rgba(247,247,243,.72);--shadow:0 28px 70px rgba(17,17,15,.18);font-family:Arial,Helvetica,sans-serif}*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--paper);color:var(--ink)}body{overflow:hidden;letter-spacing:0}button,a{color:inherit;font:inherit}button{cursor:pointer;border:0;background:none}.site{position:relative;width:100vw;min-height:100vh;isolation:isolate}.carousel-shell{position:absolute;inset:0;overflow:hidden;perspective:1200px;touch-action:pan-y;user-select:none}.carousel{position:absolute;inset:0;transform-style:preserve-3d}.work{--x:0;--y:0;--z:0;--r:0;position:absolute;left:50%;top:50%;width:clamp(230px,28vw,440px);aspect-ratio:.76;transform:translate(-50%,-50%) translate3d(calc(var(--x)*1px),calc(var(--y)*1px),calc(var(--z)*1px)) rotateZ(calc(var(--r)*1deg));transition:transform .7s cubic-bezier(.2,.8,.2,1),opacity .42s,filter .42s;opacity:var(--opacity,1);filter:saturate(var(--sat,1)) blur(calc(var(--blur,0)*1px));border:1px solid rgba(17,17,15,.2);background:#dedbd2;box-shadow:var(--shadow);overflow:hidden;cursor:pointer}.work:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.2),transparent 30%),linear-gradient(0deg,rgba(17,17,15,.34),transparent 46%);pointer-events:none}.work img,.work video,.work div>video{width:100%;height:100%;object-fit:cover;display:block}.work-meta{position:absolute;z-index:2;left:12px;right:12px;bottom:12px;display:grid;gap:5px;color:white;text-shadow:0 1px 16px rgba(0,0,0,.45)}.work-title{margin:0;font-size:clamp(16px,2.1vw,27px);line-height:.95;font-weight:700;text-transform:uppercase}.work-detail{margin:0;display:flex;justify-content:space-between;gap:10px;font-size:10px;text-transform:uppercase}.project-info{position:fixed;z-index:16;left:clamp(12px,2vw,28px);bottom:clamp(14px,2vw,28px);width:min(390px,calc(100vw - 28px));display:grid;gap:16px;pointer-events:none}.project-info p,.project-info h1{margin:0}.counter{font-size:11px;color:var(--muted);text-transform:uppercase}.current-title{font-size:clamp(34px,7vw,94px);line-height:.85;text-transform:uppercase;max-width:9ch}.current-note{width:min(360px,92vw);font-size:13px;line-height:1.35;color:rgba(17,17,15,.72)}.controls{position:fixed;z-index:22;right:clamp(8px,1vw,14px);bottom:clamp(8px,1vw,14px);display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--line);border-radius:6px;background:var(--glass);backdrop-filter:blur(16px)}.icon-button,.mode-button{min-width:42px;height:42px;display:inline-grid;place-items:center;border-radius:4px;color:var(--muted);text-transform:uppercase;font-size:10px;transition:background .16s,color .16s}.mode-button{width:82px}.icon-button:hover,.mode-button:hover,.mode-button[aria-pressed=true]{color:var(--ink);background:rgba(17,17,15,.08)}.index-panel{position:fixed;z-index:18;inset:auto clamp(8px,1vw,14px) 68px auto;width:min(520px,calc(100vw - 16px));max-height:min(58vh,560px);overflow:auto;border:1px solid var(--line);border-radius:6px;background:rgba(247,247,243,.92);backdrop-filter:blur(18px);transform-origin:bottom right;transform:scale(.98) translateY(12px);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}.index-panel.is-open{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.index-row{width:100%;display:grid;grid-template-columns:52px 1fr 86px;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--line);text-align:left;text-transform:uppercase;font-size:11px}.index-row:last-child{border-bottom:0}.index-row:hover,.index-row[aria-current=true]{background:rgba(17,17,15,.06)}.index-thumb{width:52px;height:52px;object-fit:cover;border-radius:3px;border:1px solid var(--line);background:#dedbd2}.index-thumb video{width:100%;height:100%;object-fit:cover;display:block;border-radius:3px}.about-panel{position:fixed;z-index:15;top:92px;right:clamp(12px,2vw,28px);width:min(350px,calc(100vw - 24px));font-size:13px;line-height:1.35;color:rgba(17,17,15,.74);opacity:0;transform:translateY(-8px);pointer-events:none;transition:opacity .18s,transform .18s}.about-panel.is-open{opacity:1;transform:translateY(0);pointer-events:auto}
+    :root{--paper:#f7f7f3;--ink:#11110f;--muted:#77756e;--line:rgba(17,17,15,.16);--glass:rgba(247,247,243,.72);--shadow:0 28px 70px rgba(17,17,15,.18);font-family:Arial,Helvetica,sans-serif}*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--paper);color:var(--ink)}body{overflow:hidden;letter-spacing:0}button,a{color:inherit;font:inherit}button{cursor:pointer;border:0;background:none}.site{position:relative;width:100vw;min-height:100vh;isolation:isolate}.carousel-shell{position:absolute;inset:0;overflow:hidden;perspective:1200px;touch-action:pan-y;user-select:none}.carousel{position:absolute;inset:0;transform-style:preserve-3d}.work{--x:0;--y:0;--z:0;--r:0;position:absolute;left:50%;top:50%;width:clamp(230px,28vw,440px);aspect-ratio:.76;transform:translate(-50%,-50%) translate3d(calc(var(--x)*1px),calc(var(--y)*1px),calc(var(--z)*1px)) rotateZ(calc(var(--r)*1deg));transition:transform .7s cubic-bezier(.2,.8,.2,1),opacity .42s,filter .42s;opacity:var(--opacity,1);filter:saturate(var(--sat,1)) blur(calc(var(--blur,0)*1px));border:1px solid rgba(17,17,15,.2);background:#dedbd2;box-shadow:var(--shadow);overflow:hidden;cursor:pointer}.work:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.2),transparent 30%),linear-gradient(0deg,rgba(17,17,15,.34),transparent 46%);pointer-events:none}.work img,.work video,.work div>video{width:100%;height:100%;object-fit:cover;display:block}.work-meta{position:absolute;z-index:2;left:12px;right:12px;bottom:12px;display:grid;gap:5px;color:white;text-shadow:0 1px 16px rgba(0,0,0,.45)}.work-title{margin:0;font-size:clamp(16px,2.1vw,27px);line-height:.95;font-weight:700;text-transform:uppercase}.work-detail{margin:0;display:flex;justify-content:space-between;gap:10px;font-size:10px;text-transform:uppercase}.project-info{position:fixed;z-index:16;left:clamp(12px,2vw,28px);bottom:clamp(14px,2vw,28px);width:min(390px,calc(100vw - 28px));display:grid;gap:16px;pointer-events:none}.project-info p,.project-info h1{margin:0}.counter{font-size:11px;color:var(--muted);text-transform:uppercase}.current-title{font-size:clamp(34px,7vw,94px);line-height:.85;text-transform:uppercase;max-width:9ch}.current-note{width:min(360px,92vw);font-size:13px;line-height:1.35;color:rgba(17,17,15,.72)}.controls{position:fixed;z-index:22;right:clamp(8px,1vw,14px);bottom:clamp(8px,1vw,14px);display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--line);border-radius:6px;background:var(--glass);backdrop-filter:blur(16px)}.icon-button,.mode-button{min-width:42px;height:42px;display:inline-grid;place-items:center;border-radius:4px;color:var(--muted);text-transform:uppercase;font-size:10px;transition:background .16s,color .16s}.mode-button{width:82px}.icon-button:hover,.mode-button:hover,.mode-button[aria-pressed=true]{color:var(--ink);background:rgba(17,17,15,.08)}.index-panel{position:fixed;z-index:18;inset:auto clamp(8px,1vw,14px) 68px auto;width:min(520px,calc(100vw - 16px));max-height:min(58vh,560px);overflow:auto;border:1px solid var(--line);border-radius:6px;background:rgba(247,247,243,.92);backdrop-filter:blur(18px);transform-origin:bottom right;transform:scale(.98) translateY(12px);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}.index-panel.is-open{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.index-row{width:100%;display:grid;grid-template-columns:52px 1fr 86px;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--line);text-align:left;text-transform:uppercase;font-size:11px}.index-row:last-child{border-bottom:0}.index-row:hover,.index-row[aria-current=true]{background:rgba(17,17,15,.06)}.index-thumb{width:52px;height:52px;object-fit:cover;border-radius:3px;border:1px solid var(--line);background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden}.index-thumb img{width:100%;height:100%;object-fit:cover;display:block}.index-thumb .play-icon{color:#fff;font-size:16px;opacity:.6}.about-panel{position:fixed;z-index:15;top:92px;right:clamp(12px,2vw,28px);width:min(350px,calc(100vw - 24px));font-size:13px;line-height:1.35;color:rgba(17,17,15,.74);opacity:0;transform:translateY(-8px);pointer-events:none;transition:opacity .18s,transform .18s}.about-panel.is-open{opacity:1;transform:translateY(0);pointer-events:auto}
 
     /* Project Detail / Dive-in */
     .project-detail{position:fixed;inset:0;z-index:50;background:var(--paper);overflow-y:auto;transform:translateY(100%);transition:transform .5s cubic-bezier(.2,.8,.2,1)}.project-detail.is-open{transform:translateY(0)}.detail-header{position:sticky;top:0;background:var(--paper);border-bottom:1px solid var(--line);padding:20px clamp(12px,2vw,28px);display:flex;justify-content:space-between;align-items:center;z-index:2}.detail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;padding:28px clamp(12px,2vw,28px)}.detail-media{position:relative;border-radius:6px;overflow:hidden;border:1px solid var(--line);background:#dedbd2;cursor:pointer;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}.detail-media img,.detail-media video{max-width:100%;max-height:100%;object-fit:contain;display:block}.detail-caption{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:linear-gradient(0deg,rgba(17,17,15,.65),transparent);color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:.02em}.detail-body{padding:0 clamp(12px,2vw,28px) 48px;max-width:760px}.detail-note{font-size:14px;line-height:1.6;color:rgba(17,17,15,.72);margin:0}.detail-meta{font-size:11px;color:var(--muted);text-transform:uppercase;margin-top:12px}.detail-link{display:inline-block;margin-top:12px;font-size:12px;color:var(--ink);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--line);padding-bottom:2px;text-decoration:none}
@@ -21,6 +21,7 @@
 
     @media(max-width:760px){.work{width:clamp(185px,56vw,285px)}.project-info{bottom:88px;gap:10px}.current-title{font-size:clamp(32px,13vw,58px)}.current-note{max-width:280px;font-size:12px}.controls{left:8px;right:8px;justify-content:space-between}.mode-button{flex:1}.detail-grid{grid-template-columns:1fr}.admin-file-row{gap:6px}}@media(prefers-reduced-motion:reduce){.work,.index-panel,.about-panel,.icon-button,.mode-button,.project-detail,.admin-panel,.admin-modal,.lightbox,.admin-file-row{transition:none}}
   </style>
+<base target="_blank">
 </head>
 <body>
   <main class="site" aria-label="Portfolio carousel">
@@ -86,61 +87,44 @@
   </div>
 
   <script>
-    /*
-      FOLDER STRUCTURE (add these to your GitHub repo):
-
-      your-repo/
-      |-- index.html
-      |-- img/
-      |   |-- signal-room-cover.jpg
-      |   |-- signal-room-detail1.jpg
-      |   |-- placeholder.jpg
-      |   |-- (add your project images here)
-      |-- video/
-          |-- signal-room-demo.mp4
-          |-- (add your project videos here)
-
-      Media is loaded via relative paths. Host on GitHub Pages:
-      https://username.github.io/repo-name/
-    */
     const DEFAULT_PROJECTS = [
-  {
-    title: "Groceries",
-    description: "2025",
-    tags: "Exhibition",
-    projectLink: "https://www.behance.net/gallery/245665945/Groceries",
-    note: "",
-    files: [
-      { url: "img/groceries_01.png", caption: "001", type: "image" },
-      { url: "img/groceries_02.png", caption: "002", type: "image" }
-    ]
-  },
-  {
-    title: "GENEA",
-    description: "2025-2026",
-    tags: "Scifi",
-    projectLink: "https://www.artstation.com/sevenfour_heavenfall/albums/14156663",
-    note: "Insionis Extraction Corporation",
-    files: [
-      { url: "video/Genea_001.mp4", caption: "001", type: "video" },
-      { url: "video/Genea_002.mp4", caption: "002", type: "video" },
-      { url: "video/Genea_003.mp4", caption: "003", type: "video" }
-    ]
-  },
-  {
-    title: "LOADING SCREEN",
-    description: "2025-2026",
-    tags: "animation",
-    projectLink: "https://www.artstation.com/sevenfour_heavenfall/albums/14156667",
-    note: "concept art of video game loading screen",
-    files: [
-      { url: "video/loading_001.mp4", caption: "001", type: "video" },
-      { url: "video/loading_002.mp4", caption: "002", type: "video" },
-      { url: "video/loading_003.mp4", caption: "003", type: "video" },
-      { url: "video/loading_004.mp4", caption: "004", type: "video" }
-    ]
-  }
-];
+      {
+        title: "Groceries",
+        description: "2025",
+        tags: "Exhibition",
+        projectLink: "https://www.behance.net/gallery/245665945/Groceries",
+        note: "",
+        files: [
+          { url: "img/groceries_01.png", caption: "001", type: "image" },
+          { url: "img/groceries_02.png", caption: "002", type: "image" }
+        ]
+      },
+      {
+        title: "GENEA",
+        description: "2025-2026",
+        tags: "Scifi",
+        projectLink: "https://www.artstation.com/sevenfour_heavenfall/albums/14156663",
+        note: "Insionis Extraction Corporation",
+        files: [
+          { url: "video/Genea_001.mp4", caption: "001", type: "video" },
+          { url: "video/Genea_002.mp4", caption: "002", type: "video" },
+          { url: "video/Genea_003.mp4", caption: "003", type: "video" }
+        ]
+      },
+      {
+        title: "LOADING SCREEN",
+        description: "2025-2026",
+        tags: "animation",
+        projectLink: "https://www.artstation.com/sevenfour_heavenfall/albums/14156667",
+        note: "concept art of video game loading screen",
+        files: [
+          { url: "video/loading_001.mp4", caption: "001", type: "video" },
+          { url: "video/loading_002.mp4", caption: "002", type: "video" },
+          { url: "video/loading_003.mp4", caption: "003", type: "video" },
+          { url: "video/loading_004.mp4", caption: "004", type: "video" }
+        ]
+      }
+    ];
 
     /* State */
     let projects=[];
@@ -220,7 +204,7 @@
           resolve(canvas.toDataURL('image/jpeg',quality));
           URL.revokeObjectURL(url);
         };
-        img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Image load failed'));};
+        img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Image load failed'));}
       });
     }
     /* Generate poster frame from video file */
@@ -245,7 +229,8 @@
           resolve(canvas.toDataURL('image/jpeg',quality));
           URL.revokeObjectURL(url);
         });
-        video.addEventListener('error',()=>{URL.revokeObjectURL(url);reject(new Error('Video load failed'));});
+        video.addEventListener('error',()=>{URL.revokeObjectURL(url);reject(new Error('Video load failed'));}
+        );
         video.load();
       });
     }
@@ -262,24 +247,33 @@
     }
     function isVideo(f){return getFileType(f)==='video';}
 
-    /* Thumbnail media builder */
+    /* Dark video placeholder SVG (base64) */
+    const VIDEO_PLACEHOLDER = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTIiIGhlaWdodD0iNTIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjUyIiBoZWlnaHQ9IjUyIiBmaWxsPSIjMTExIi8+PHBhdGggZD0iTTE4IDE2bDIwIDEwLTIwIDEweiIgZmlsbD0iIzMzMyIvPjwvc3ZnPg==';
+
+    /* Thumbnail media builder - FIXED */
     function thumbMedia(p){
       const f=p.files&&p.files[0];
       if(!f)return '<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="">';
       if(isVideo(f)){
         const poster=f.poster?' poster="'+f.poster+'"':'';
-        // Use <source> with explicit type to fix GitHub Pages MIME type bug
-        return '<div style="position:relative;width:100%;height:100%;background:#111;"><video'+poster+' muted loop autoplay playsinline preload="auto" disablePictureInPicture style="width:100%;height:100%;object-fit:cover;display:block;"><source src="'+f.url+'" type="video/mp4"></video><span style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;text-transform:uppercase;letter-spacing:.06em;padding:4px 8px;border-radius:3px;pointer-events:none;z-index:3;">Video</span></div>';
+        // Use src attribute directly (not <source> tag) for better autoplay compatibility
+        return '<div style="position:relative;width:100%;height:100%;background:#111;">'+
+          '<video src="'+f.url+'"'+poster+' muted loop autoplay playsinline preload="auto" disablePictureInPicture '+
+          'style="width:100%;height:100%;object-fit:cover;display:block;" '+
+          'onloadeddata="this.play().catch(()=>{})"></video>'+
+          '<span style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;text-transform:uppercase;letter-spacing:.06em;padding:4px 8px;border-radius:3px;pointer-events:none;z-index:3;">Video</span>'+
+          '</div>';
       }
       return '<img src="'+f.url+'" alt="'+p.title+'">';
     }
+
+    /* Thumbnail URL - FIXED: returns dark placeholder for videos instead of transparent pixel */
     function thumbUrl(p){
       const f=p.files&&p.files[0];
       if(!f)return 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
       if(isVideo(f)){
         if(f.poster)return f.poster;
-        // For videos without poster, return a transparent pixel - caller should handle
-        return 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+        return VIDEO_PLACEHOLDER;
       }
       return f.url;
     }
@@ -287,7 +281,23 @@
     /* Rendering */
     function render(){
       carousel.innerHTML=projects.map((p,i)=>'<article class="work" data-index="'+i+'">'+thumbMedia(p)+'<div class="work-meta"><h2 class="work-title">'+p.title+'</h2><p class="work-detail"><span>'+p.tags+'</span><span>'+p.description.substring(0,18)+'...</span></p></div></article>').join('');
-      indexPanel.innerHTML=projects.map((p,i)=>'<button class="index-row" type="button" data-index="'+i+'" aria-current="false">'+(isVideo(p.files&&p.files[0])?(p.files[0].poster?'<div style="position:relative;width:52px;height:52px;overflow:hidden;border-radius:3px;border:1px solid var(--line);background:#111;"><img src="'+p.files[0].poster+'" style="width:100%;height:100%;object-fit:cover;display:block;"><span style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;font-size:7px;padding:1px 4px;border-radius:2px;pointer-events:none;">▶</span></div>':'<div style="position:relative;width:52px;height:52px;overflow:hidden;border-radius:3px;border:1px solid var(--line);background:#111;display:flex;align-items:center;justify-content:center;"><span style="color:#fff;font-size:7px;text-transform:uppercase;">Video</span><span style="position:absolute;bottom:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;font-size:7px;padding:1px 4px;border-radius:2px;pointer-events:none;">▶</span></div>'):'<img class="index-thumb" src="'+thumbUrl(p)+'" alt="">')+'<span>'+p.title+'<br><span style="color:var(--muted)">'+p.tags+'</span></span><span>'+p.description.substring(0,12)+'...</span></button>').join('');
+
+      // FIXED index panel: proper video thumbnail handling
+      indexPanel.innerHTML=projects.map((p,i)=>{
+        const f=p.files&&p.files[0];
+        let thumbHtml;
+        if(f&&isVideo(f)){
+          if(f.poster){
+            thumbHtml='<div class="index-thumb"><img src="'+f.poster+'" alt=""><span class="play-icon">&#9654;</span></div>';
+          }else{
+            thumbHtml='<div class="index-thumb" style="background:#111;"><span class="play-icon">&#9654;</span></div>';
+          }
+        }else{
+          thumbHtml='<img class="index-thumb" src="'+thumbUrl(p)+'" alt="">';
+        }
+        return '<button class="index-row" type="button" data-index="'+i+'" aria-current="false">'+thumbHtml+'<span>'+p.title+'<br><span style="color:var(--muted)">'+p.tags+'</span></span><span>'+p.description.substring(0,12)+'...</span></button>';
+      }).join('');
+
       carousel.querySelectorAll('.work').forEach(c=>c.addEventListener('click',()=>openDetail(Number(c.dataset.index))));
       indexPanel.querySelectorAll('.index-row').forEach(r=>r.addEventListener('click',()=>{goTo(Number(r.dataset.index));setIndex(false)}));
       update();
@@ -422,7 +432,6 @@
         const reader=new FileReader();
         reader.onload=(ev)=>{
           const videoUrl=ev.target.result;
-          // Generate poster frame from video
           generateVideoPoster(file).then(poster=>{
             process(videoUrl,'video',poster);
           }).catch(err=>{
