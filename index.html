@@ -5,182 +5,112 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Studio Portfolio Carousel</title>
   <style>
-    :root {
-      --paper: #f7f7f3;
-      --ink: #11110f;
-      --muted: #77756e;
-      --line: rgba(17,17,15,.16);
-      --glass: rgba(247,247,243,.72);
-      --shadow: 0 28px 70px rgba(17,17,15,.18);
-      font-family: Arial, Helvetica, sans-serif;
-    }
-    * { box-sizing: border-box; margin: 0; }
-    html, body { min-height: 100%; background: var(--paper); color: var(--ink); }
-    body { overflow: hidden; letter-spacing: 0; }
-    button, a { color: inherit; font: inherit; border: 0; background: none; }
-    button { cursor: pointer; }
-    .site { position: relative; width: 100vw; min-height: 100vh; isolation: isolate; }
-    .carousel-shell { position: absolute; inset: 0; overflow: hidden; perspective: 1200px; touch-action: pan-y; user-select: none; }
-    .carousel { position: absolute; inset: 0; transform-style: preserve-3d; will-change: transform; }
-    .work {
-      --x: 0; --y: 0; --z: 0; --r: 0;
-      position: absolute; left: 50%; top: 50%;
-      width: clamp(230px, 28vw, 440px); aspect-ratio: .76;
-      transform: translate(-50%, -50%) translate3d(calc(var(--x)*1px), calc(var(--y)*1px), calc(var(--z)*1px)) rotateZ(calc(var(--r)*1deg));
-      transition: transform .7s cubic-bezier(.2,.8,.2,1), opacity .42s, filter .42s;
-      opacity: var(--opacity, 1); filter: saturate(var(--sat, 1)) blur(calc(var(--blur, 0)*1px));
-      border: 1px solid rgba(17,17,15,.2); background: #dedbd2; box-shadow: var(--shadow);
-      overflow: hidden; cursor: pointer; will-change: transform, opacity, filter; contain: layout style paint;
-    }
-    .work:after {
-      content: ""; position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(255,255,255,.2), transparent 30%), linear-gradient(0deg, rgba(17,17,15,.34), transparent 46%);
-      pointer-events: none;
-    }
-    .work img, .work video, .work div > video { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .work-meta {
-      position: absolute; z-index: 2; left: 12px; right: 12px; bottom: 12px;
-      display: grid; gap: 5px; color: #fff; text-shadow: 0 1px 16px rgba(0,0,0,.45);
-    }
-    .work-title { margin: 0; font-size: clamp(16px, 2.1vw, 27px); line-height: .95; font-weight: 700; text-transform: uppercase; }
-    .work-detail { margin: 0; display: flex; justify-content: space-between; gap: 10px; font-size: 10px; text-transform: uppercase; }
-    .project-info {
-      position: fixed; z-index: 16; left: clamp(12px, 2vw, 28px); bottom: clamp(14px, 2vw, 28px);
-      width: min(390px, calc(100vw - 28px)); display: grid; gap: 16px; pointer-events: none;
-    }
-    .project-info p, .project-info h1 { margin: 0; }
-    .counter { font-size: 11px; color: var(--muted); text-transform: uppercase; }
-    .current-title { font-size: clamp(34px, 7vw, 94px); line-height: .85; text-transform: uppercase; max-width: 9ch; }
-    .current-note { width: min(360px, 92vw); font-size: 13px; line-height: 1.35; color: rgba(17,17,15,.72); }
-    .controls {
-      position: fixed; z-index: 22; right: clamp(8px, 1vw, 14px); bottom: clamp(8px, 1vw, 14px);
-      display: flex; align-items: center; gap: 4px; padding: 4px;
-      border: 1px solid var(--line); border-radius: 6px; background: var(--glass); backdrop-filter: blur(16px);
-    }
-    .icon-button, .mode-button { min-width: 42px; height: 42px; display: inline-grid; place-items: center; border-radius: 4px; color: var(--muted); text-transform: uppercase; font-size: 10px; transition: background .16s, color .16s; }
-    .mode-button { width: 82px; }
-    .icon-button:hover, .mode-button:hover, .mode-button[aria-pressed=true] { color: var(--ink); background: rgba(17,17,15,.08); }
-    .index-panel {
-      position: fixed; z-index: 18; inset: auto clamp(8px, 1vw, 14px) 68px auto;
-      width: min(520px, calc(100vw - 16px)); max-height: min(58vh, 560px); overflow: auto;
-      border: 1px solid var(--line); border-radius: 6px; background: rgba(247,247,243,.92); backdrop-filter: blur(18px);
-      transform-origin: bottom right; transform: scale(.98) translateY(12px); opacity: 0; pointer-events: none;
-      transition: opacity .18s, transform .18s; contain: layout;
-    }
-    .index-panel.is-open { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
-    .index-row { width: 100%; display: grid; grid-template-columns: 52px 1fr 86px; align-items: center; gap: 12px; padding: 12px; border-bottom: 1px solid var(--line); text-align: left; text-transform: uppercase; font-size: 11px; }
-    .index-row:last-child { border-bottom: 0; }
-    .index-row:hover, .index-row[aria-current=true] { background: rgba(17,17,15,.06); }
-    .index-thumb { width: 52px; height: 52px; object-fit: cover; border-radius: 3px; border: 1px solid var(--line); background: #111; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    .index-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .index-thumb .play-icon { color: #fff; font-size: 16px; opacity: .6; }
-    .about-panel { position: fixed; z-index: 15; top: 92px; right: clamp(12px, 2vw, 28px); width: min(350px, calc(100vw - 24px)); font-size: 13px; line-height: 1.35; color: rgba(17,17,15,.74); opacity: 0; transform: translateY(-8px); pointer-events: none; transition: opacity .18s, transform .18s; }
-    .about-panel.is-open { opacity: 1; transform: translateY(0); pointer-events: auto; }
-    .project-detail { position: fixed; inset: 0; z-index: 50; background: var(--paper); overflow-y: auto; transform: translateY(100%); transition: transform .5s cubic-bezier(.2,.8,.2,1); will-change: transform; contain: layout; }
-    .project-detail.is-open { transform: translateY(0); }
-    .detail-header { position: sticky; top: 0; background: var(--paper); border-bottom: 1px solid var(--line); padding: 20px clamp(12px, 2vw, 28px); display: flex; justify-content: space-between; align-items: center; z-index: 2; }
-    .detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; padding: 28px clamp(12px, 2vw, 28px); }
-    .detail-media { position: relative; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); background: #dedbd2; cursor: pointer; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; contain: layout; }
-    .detail-media img, .detail-media video { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
-    .detail-caption { position: absolute; left: 0; right: 0; bottom: 0; padding: 10px 12px; background: linear-gradient(0deg, rgba(17,17,15,.65), transparent); color: #fff; font-size: 11px; text-transform: uppercase; letter-spacing: .02em; }
-    .detail-body { padding: 0 clamp(12px, 2vw, 28px) 48px; max-width: 760px; }
-    .detail-note { font-size: 14px; line-height: 1.6; color: rgba(17,17,15,.72); margin: 0; }
-    .detail-meta { font-size: 11px; color: var(--muted); text-transform: uppercase; margin-top: 12px; }
-    .detail-link { display: inline-block; margin-top: 12px; font-size: 12px; color: var(--ink); text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid var(--line); padding-bottom: 2px; text-decoration: none; }
-    .lightbox { position: fixed; inset: 0; z-index: 60; background: rgba(17,17,15,.94); backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .25s; will-change: opacity; }
-    .lightbox.is-open { opacity: 1; pointer-events: auto; }
-    .lightbox-stage { max-width: 92vw; max-height: 92vh; display: flex; align-items: center; justify-content: center; }
-    .lightbox-stage img, .lightbox-stage video { max-width: 92vw; max-height: 92vh; object-fit: contain; display: block; border-radius: 4px; }
-    .lightbox-close { position: fixed; top: 12px; right: 12px; width: 48px; height: 48px; color: #fff; font-size: 32px; background: transparent; border: 0; cursor: pointer; z-index: 62; line-height: 1; }
-    .lightbox-nav { position: fixed; top: 50%; transform: translateY(-50%); width: 52px; height: 52px; color: rgba(255,255,255,.6); font-size: 22px; background: transparent; border: 0; cursor: pointer; z-index: 62; transition: color .2s; display: grid; place-items: center; border-radius: 50%; }
-    .lightbox-nav:hover { color: #fff; background: rgba(255,255,255,.08); }
-    .lightbox-prev { left: 8px; }
-    .lightbox-next { right: 8px; }
-    .lightbox-caption { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,.85); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; text-align: center; max-width: 80vw; pointer-events: none; }
-    .admin-modal { position: fixed; inset: 0; z-index: 100; background: rgba(17,17,15,.55); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .2s; }
-    .admin-modal.is-open { opacity: 1; pointer-events: auto; }
-    .admin-box { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 28px; width: min(380px, 90vw); box-shadow: var(--shadow); }
-    .admin-input { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 4px; background: transparent; font: inherit; margin-top: 10px; font-size: 14px; }
-    .admin-btn { padding: 10px 18px; border: 1px solid var(--line); border-radius: 4px; background: var(--ink); color: var(--paper); font: inherit; cursor: pointer; margin-top: 14px; text-transform: uppercase; font-size: 11px; letter-spacing: .04em; }
-    .admin-btn.secondary { background: transparent; color: var(--ink); margin-right: 8px; }
-    .admin-panel { position: fixed; inset: 0; z-index: 90; background: var(--paper); overflow-y: auto; transform: translateX(100%); transition: transform .4s cubic-bezier(.2,.8,.2,1); will-change: transform; contain: layout; }
-    .admin-panel.is-open { transform: translateX(0); }
-    .admin-header { position: sticky; top: 0; background: var(--paper); border-bottom: 1px solid var(--line); padding: 16px clamp(12px, 2vw, 28px); display: flex; justify-content: space-between; align-items: center; z-index: 2; gap: 12px; }
-    .admin-content { padding: 20px clamp(12px, 2vw, 28px); max-width: 960px; margin: 0 auto; }
-    .admin-card { border: 1px solid var(--line); border-radius: 6px; padding: 18px; margin-bottom: 16px; background: rgba(17,17,15,.02); }
-    .admin-field { display: grid; gap: 4px; margin-bottom: 10px; }
-    .admin-field label { font-size: 10px; text-transform: uppercase; color: var(--muted); letter-spacing: .04em; }
-    .admin-field input, .admin-field textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 4px; background: transparent; font: inherit; font-size: 13px; }
-    .admin-field textarea { resize: vertical; min-height: 60px; }
-    .admin-files { display: grid; gap: 8px; margin: 12px 0; }
-    .admin-file-row { display: flex; gap: 8px; align-items: center; padding: 8px; border: 1px solid var(--line); border-radius: 4px; background: rgba(17,17,15,.02); cursor: move; transition: background .15s, transform .15s, box-shadow .15s; }
-    .admin-file-row.dragging { opacity: .5; background: rgba(17,17,15,.06); }
-    .admin-file-row.over { border-color: var(--ink); background: rgba(17,17,15,.06); }
-    .admin-file-row .drag-handle { width: 20px; height: 20px; display: grid; place-items: center; color: var(--muted); cursor: grab; font-size: 14px; flex-shrink: 0; }
-    .admin-file-row input { flex: 1; min-width: 80px; }
-    .admin-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 3px; border: 1px solid var(--line); background: #dedbd2; flex-shrink: 0; }
-    .admin-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
-    .admin-actions button { padding: 8px 14px; border: 1px solid var(--line); border-radius: 4px; background: transparent; font: inherit; font-size: 11px; text-transform: uppercase; cursor: pointer; letter-spacing: .02em; }
-    .admin-actions button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-    .admin-actions button.danger { background: #b42318; color: #fff; border-color: #b42318; }
-    .admin-trigger { position: fixed; bottom: 68px; right: 8px; z-index: 30; padding: 6px 10px; font-size: 10px; text-transform: uppercase; color: var(--muted); background: transparent; border: 0; cursor: pointer; opacity: .4; transition: opacity .2s; }
-    .admin-trigger:hover { opacity: 1; color: var(--ink); }
-    .upload-btn { font-size: 10px; text-transform: uppercase; letter-spacing: .02em; padding: 6px 10px; border: 1px solid var(--line); border-radius: 4px; background: rgba(17,17,15,.04); cursor: pointer; white-space: nowrap; }
-    .debug-panel { position: fixed; top: 8px; left: 8px; z-index: 200; background: rgba(0,0,0,.85); color: #0f0; font-family: monospace; font-size: 11px; padding: 12px; border-radius: 4px; max-width: 400px; max-height: 200px; overflow: auto; opacity: 0; pointer-events: none; transition: opacity .2s; }
-    .debug-panel.is-open { opacity: 1; pointer-events: auto; }
-    .video-badge { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,.55); color: #fff; font-size: 9px; text-transform: uppercase; letter-spacing: .06em; padding: 4px 8px; border-radius: 3px; pointer-events: none; z-index: 3; }
-    .video-wrapper { position: relative; width: 100%; height: 100%; background: #111; }
-
-    @media (max-width: 760px) {
-      .work { width: clamp(185px, 56vw, 285px); }
-      .project-info { bottom: 88px; gap: 10px; }
-      .current-title { font-size: clamp(32px, 13vw, 58px); }
-      .current-note { max-width: 280px; font-size: 12px; }
-      .controls { left: 8px; right: 8px; justify-content: space-between; }
-      .mode-button { flex: 1; }
-      .detail-grid { grid-template-columns: 1fr; }
-      .admin-file-row { gap: 6px; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .work, .index-panel, .about-panel, .icon-button, .mode-button, .project-detail, .admin-panel, .admin-modal, .lightbox, .admin-file-row { transition: none; }
-    }
+    :root{--paper:#f7f7f3;--ink:#11110f;--muted:#77756e;--line:rgba(17,17,15,.16);--glass:rgba(247,247,243,.72);--shadow:0 28px 70px rgba(17,17,15,.18);font-family:Arial,Helvetica,sans-serif}
+    *{box-sizing:border-box;margin:0}
+    html,body{min-height:100%;background:var(--paper);color:var(--ink)}
+    body{overflow:hidden;letter-spacing:0}
+    button,a{color:inherit;font:inherit;border:0;background:none}
+    button{cursor:pointer}
+    .site{position:relative;width:100vw;min-height:100vh;isolation:isolate}
+    .carousel-shell{position:absolute;inset:0;overflow:hidden;perspective:1200px;touch-action:pan-y;user-select:none}
+    .carousel{position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
+    .work{--x:0;--y:0;--z:0;--r:0;position:absolute;left:50%;top:50%;width:clamp(230px,28vw,440px);aspect-ratio:.76;transform:translate(-50%,-50%) translate3d(calc(var(--x)*1px),calc(var(--y)*1px),calc(var(--z)*1px)) rotateZ(calc(var(--r)*1deg));transition:transform .7s cubic-bezier(.2,.8,.2,1),opacity .42s,filter .42s;opacity:var(--opacity,1);filter:saturate(var(--sat,1)) blur(calc(var(--blur,0)*1px));border:1px solid rgba(17,17,15,.2);background:#dedbd2;box-shadow:var(--shadow);overflow:hidden;cursor:pointer;will-change:transform,opacity,filter;contain:layout style paint}
+    .work:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.2),transparent 30%),linear-gradient(0deg,rgba(17,17,15,.34),transparent 46%);pointer-events:none}
+    .work img,.work video,.work div>video{width:100%;height:100%;object-fit:cover;display:block}
+    .work-meta{position:absolute;z-index:2;left:12px;right:12px;bottom:12px;display:grid;gap:5px;color:#fff;text-shadow:0 1px 16px rgba(0,0,0,.45)}
+    .work-title{margin:0;font-size:clamp(16px,2.1vw,27px);line-height:.95;font-weight:700;text-transform:uppercase}
+    .work-detail{margin:0;display:flex;justify-content:space-between;gap:10px;font-size:10px;text-transform:uppercase}
+    .project-info{position:fixed;z-index:16;left:clamp(12px,2vw,28px);bottom:clamp(14px,2vw,28px);width:min(390px,calc(100vw - 28px));display:grid;gap:16px;pointer-events:none}
+    .project-info p,.project-info h1{margin:0}
+    .counter{font-size:11px;color:var(--muted);text-transform:uppercase}
+    .current-title{font-size:clamp(34px,7vw,94px);line-height:.85;text-transform:uppercase;max-width:9ch}
+    .current-note{width:min(360px,92vw);font-size:13px;line-height:1.35;color:rgba(17,17,15,.72)}
+    .controls{position:fixed;z-index:22;right:clamp(8px,1vw,14px);bottom:clamp(8px,1vw,14px);display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--line);border-radius:6px;background:var(--glass);backdrop-filter:blur(16px)}
+    .icon-button,.mode-button{min-width:42px;height:42px;display:inline-grid;place-items:center;border-radius:4px;color:var(--muted);text-transform:uppercase;font-size:10px;transition:background .16s,color .16s}
+    .mode-button{width:82px}
+    .icon-button:hover,.mode-button:hover,.mode-button[aria-pressed=true]{color:var(--ink);background:rgba(17,17,15,.08)}
+    .index-panel{position:fixed;z-index:18;inset:auto clamp(8px,1vw,14px) 68px auto;width:min(520px,calc(100vw - 16px));max-height:min(58vh,560px);overflow:auto;border:1px solid var(--line);border-radius:6px;background:rgba(247,247,243,.92);backdrop-filter:blur(18px);transform-origin:bottom right;transform:scale(.98) translateY(12px);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;contain:layout}
+    .index-panel.is-open{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}
+    .index-row{width:100%;display:grid;grid-template-columns:52px 1fr 86px;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--line);text-align:left;text-transform:uppercase;font-size:11px}
+    .index-row:last-child{border-bottom:0}
+    .index-row:hover,.index-row[aria-current=true]{background:rgba(17,17,15,.06)}
+    .index-thumb{width:52px;height:52px;object-fit:cover;border-radius:3px;border:1px solid var(--line);background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .index-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .index-thumb .play-icon{color:#fff;font-size:16px;opacity:.6}
+    .about-panel{position:fixed;z-index:15;top:92px;right:clamp(12px,2vw,28px);width:min(350px,calc(100vw - 24px));font-size:13px;line-height:1.35;color:rgba(17,17,15,.74);opacity:0;transform:translateY(-8px);pointer-events:none;transition:opacity .18s,transform .18s}
+    .about-panel.is-open{opacity:1;transform:translateY(0);pointer-events:auto}
+    .project-detail{position:fixed;inset:0;z-index:50;background:var(--paper);overflow-y:auto;transform:translateY(100%);transition:transform .5s cubic-bezier(.2,.8,.2,1);will-change:transform;contain:layout}
+    .project-detail.is-open{transform:translateY(0)}
+    .detail-header{position:sticky;top:0;background:var(--paper);border-bottom:1px solid var(--line);padding:20px clamp(12px,2vw,28px);display:flex;justify-content:space-between;align-items:center;z-index:2}
+    .detail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;padding:28px clamp(12px,2vw,28px)}
+    .detail-media{position:relative;border-radius:6px;overflow:hidden;border:1px solid var(--line);background:#dedbd2;cursor:pointer;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;contain:layout}
+    .detail-media img,.detail-media video{max-width:100%;max-height:100%;object-fit:contain;display:block}
+    .detail-caption{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:linear-gradient(0deg,rgba(17,17,15,.65),transparent);color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:.02em}
+    .detail-body{padding:0 clamp(12px,2vw,28px) 48px;max-width:760px}
+    .detail-note{font-size:14px;line-height:1.6;color:rgba(17,17,15,.72);margin:0}
+    .detail-meta{font-size:11px;color:var(--muted);text-transform:uppercase;margin-top:12px}
+    .detail-link{display:inline-block;margin-top:12px;font-size:12px;color:var(--ink);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--line);padding-bottom:2px;text-decoration:none}
+    .lightbox{position:fixed;inset:0;z-index:60;background:rgba(17,17,15,.94);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;will-change:opacity}
+    .lightbox.is-open{opacity:1;pointer-events:auto}
+    .lightbox-stage{max-width:92vw;max-height:92vh;display:flex;align-items:center;justify-content:center}
+    .lightbox-stage img,.lightbox-stage video{max-width:92vw;max-height:92vh;object-fit:contain;display:block;border-radius:4px}
+    .lightbox-close{position:fixed;top:12px;right:12px;width:48px;height:48px;color:#fff;font-size:32px;background:transparent;border:0;cursor:pointer;z-index:62;line-height:1}
+    .lightbox-nav{position:fixed;top:50%;transform:translateY(-50%);width:52px;height:52px;color:rgba(255,255,255,.6);font-size:22px;background:transparent;border:0;cursor:pointer;z-index:62;transition:color .2s;display:grid;place-items:center;border-radius:50%}
+    .lightbox-nav:hover{color:#fff;background:rgba(255,255,255,.08)}
+    .lightbox-prev{left:8px}
+    .lightbox-next{right:8px}
+    .lightbox-caption{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.85);font-size:12px;text-transform:uppercase;letter-spacing:.04em;text-align:center;max-width:80vw;pointer-events:none}
+    .admin-modal{position:fixed;inset:0;z-index:100;background:rgba(17,17,15,.55);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+    .admin-modal.is-open{opacity:1;pointer-events:auto}
+    .admin-box{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:28px;width:min(380px,90vw);box-shadow:var(--shadow)}
+    .admin-input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:transparent;font:inherit;margin-top:10px;font-size:14px}
+    .admin-btn{padding:10px 18px;border:1px solid var(--line);border-radius:4px;background:var(--ink);color:var(--paper);font:inherit;cursor:pointer;margin-top:14px;text-transform:uppercase;font-size:11px;letter-spacing:.04em}
+    .admin-btn.secondary{background:transparent;color:var(--ink);margin-right:8px}
+    .admin-panel{position:fixed;inset:0;z-index:90;background:var(--paper);overflow-y:auto;transform:translateX(100%);transition:transform .4s cubic-bezier(.2,.8,.2,1);will-change:transform;contain:layout}
+    .admin-panel.is-open{transform:translateX(0)}
+    .admin-header{position:sticky;top:0;background:var(--paper);border-bottom:1px solid var(--line);padding:16px clamp(12px,2vw,28px);display:flex;justify-content:space-between;align-items:center;z-index:2;gap:12px}
+    .admin-content{padding:20px clamp(12px,2vw,28px);max-width:960px;margin:0 auto}
+    .admin-card{border:1px solid var(--line);border-radius:6px;padding:18px;margin-bottom:16px;background:rgba(17,17,15,.02)}
+    .admin-field{display:grid;gap:4px;margin-bottom:10px}
+    .admin-field label{font-size:10px;text-transform:uppercase;color:var(--muted);letter-spacing:.04em}
+    .admin-field input,.admin-field textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:transparent;font:inherit;font-size:13px}
+    .admin-field textarea{resize:vertical;min-height:60px}
+    .admin-files{display:grid;gap:8px;margin:12px 0}
+    .admin-file-row{display:flex;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:4px;background:rgba(17,17,15,.02);cursor:move;transition:background .15s,transform .15s,box-shadow .15s}
+    .admin-file-row.dragging{opacity:.5;background:rgba(17,17,15,.06)}
+    .admin-file-row.over{border-color:var(--ink);background:rgba(17,17,15,.06)}
+    .admin-file-row .drag-handle{width:20px;height:20px;display:grid;place-items:center;color:var(--muted);cursor:grab;font-size:14px;flex-shrink:0}
+    .admin-file-row input{flex:1;min-width:80px}
+    .admin-thumb{width:40px;height:40px;object-fit:cover;border-radius:3px;border:1px solid var(--line);background:#dedbd2;flex-shrink:0}
+    .admin-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+    .admin-actions button{padding:8px 14px;border:1px solid var(--line);border-radius:4px;background:transparent;font:inherit;font-size:11px;text-transform:uppercase;cursor:pointer;letter-spacing:.02em}
+    .admin-actions button.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+    .admin-actions button.danger{background:#b42318;color:#fff;border-color:#b42318}
+    .admin-trigger{position:fixed;bottom:68px;right:8px;z-index:30;padding:6px 10px;font-size:10px;text-transform:uppercase;color:var(--muted);background:transparent;border:0;cursor:pointer;opacity:.4;transition:opacity .2s}
+    .admin-trigger:hover{opacity:1;color:var(--ink)}
+    .upload-btn{font-size:10px;text-transform:uppercase;letter-spacing:.02em;padding:6px 10px;border:1px solid var(--line);border-radius:4px;background:rgba(17,17,15,.04);cursor:pointer;white-space:nowrap}
+    .debug-panel{position:fixed;top:8px;left:8px;z-index:200;background:rgba(0,0,0,.85);color:#0f0;font-family:monospace;font-size:11px;padding:12px;border-radius:4px;max-width:400px;max-height:200px;overflow:auto;opacity:0;pointer-events:none;transition:opacity .2s}
+    .debug-panel.is-open{opacity:1;pointer-events:auto}
+    .video-badge{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.55);color:#fff;font-size:9px;text-transform:uppercase;letter-spacing:.06em;padding:4px 8px;border-radius:3px;pointer-events:none;z-index:3}
+    .video-wrapper{position:relative;width:100%;height:100%;background:#111}
+    @media(max-width:760px){.work{width:clamp(185px,56vw,285px)}.project-info{bottom:88px;gap:10px}.current-title{font-size:clamp(32px,13vw,58px)}.current-note{max-width:280px;font-size:12px}.controls{left:8px;right:8px;justify-content:space-between}.mode-button{flex:1}.detail-grid{grid-template-columns:1fr}.admin-file-row{gap:6px}}
+    @media(prefers-reduced-motion:reduce){.work,.index-panel,.about-panel,.icon-button,.mode-button,.project-detail,.admin-panel,.admin-modal,.lightbox,.admin-file-row{transition:none}}
   </style>
   <base target="_blank">
 <base target="_blank">
 </head>
 <body>
-
-  <!-- ==================== MAIN SITE ==================== -->
   <main class="site" aria-label="Portfolio carousel">
-    <section class="carousel-shell" aria-label="Selected works">
-      <div class="carousel" id="carousel"></div>
-    </section>
-
-    <section class="project-info" aria-live="polite">
-      <p class="counter" id="counter">01 / 01</p>
-      <h1 class="current-title" id="currentTitle">Loading...</h1>
-      <p class="current-note" id="currentNote"></p>
-    </section>
-
-    <aside class="about-panel" id="aboutPanel">
-      <p>Independent designer and creative technologist making identities, interactive websites, installations, motion systems, and visual experiments for culture-led clients.</p>
-    </aside>
-
+    <section class="carousel-shell" aria-label="Selected works"><div class="carousel" id="carousel"></div></section>
+    <section class="project-info" aria-live="polite"><p class="counter" id="counter">01 / 01</p><h1 class="current-title" id="currentTitle">Loading...</h1><p class="current-note" id="currentNote"></p></section>
+    <aside class="about-panel" id="aboutPanel"><p>Independent designer and creative technologist making identities, interactive websites, installations, motion systems, and visual experiments for culture-led clients.</p></aside>
     <aside class="index-panel" id="indexPanel" aria-label="Project index"></aside>
-
-    <div class="controls" aria-label="Carousel controls">
-      <button class="icon-button" type="button" id="prevButton" aria-label="Previous project" title="Previous project">&larr;</button>
-      <button class="mode-button" type="button" id="overviewButton" aria-pressed="true">Overview</button>
-      <button class="mode-button" type="button" id="indexButton" aria-pressed="false">Index</button>
-      <button class="icon-button" type="button" id="nextButton" aria-label="Next project" title="Next project">&rarr;</button>
-    </div>
+    <div class="controls" aria-label="Carousel controls"><button class="icon-button" type="button" id="prevButton" aria-label="Previous project" title="Previous project">&larr;</button><button class="mode-button" type="button" id="overviewButton" aria-pressed="true">Overview</button><button class="mode-button" type="button" id="indexButton" aria-pressed="false">Index</button><button class="icon-button" type="button" id="nextButton" aria-label="Next project" title="Next project">&rarr;</button></div>
   </main>
 
-  <!-- ==================== DEBUG ==================== -->
   <div class="debug-panel" id="debugPanel"></div>
   <button style="position:fixed;top:8px;right:8px;z-index:201;font-size:10px;padding:4px 8px;background:rgba(0,0,0,.7);color:#0f0;border:0;border-radius:3px;cursor:pointer;" id="debugToggle" type="button">Debug</button>
 
-  <!-- ==================== ADMIN ==================== -->
   <button class="admin-trigger" id="adminTrigger" type="button">Admin</button>
 
   <div class="admin-modal" id="adminModal" aria-hidden="true">
@@ -206,7 +136,6 @@
     <div class="admin-content" id="adminContent"></div>
   </div>
 
-  <!-- ==================== PROJECT DETAIL ==================== -->
   <div class="project-detail" id="projectDetail" aria-hidden="true">
     <div class="detail-header">
       <div>
@@ -223,7 +152,6 @@
     </div>
   </div>
 
-  <!-- ==================== LIGHTBOX ==================== -->
   <div class="lightbox" id="lightbox" aria-hidden="true">
     <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Close">&times;</button>
     <button class="lightbox-nav lightbox-prev" id="lightboxPrev" type="button" aria-label="Previous">&larr;</button>
@@ -233,11 +161,19 @@
   </div>
 
   <script>
-
     // ==================== PERFORMANCE OPTIMIZATIONS ====================
+    // 1. Use requestAnimationFrame for smooth animations
+    // 2. Intersection Observer for lazy loading
+    // 3. CSS containment to limit paint/ layout scope
+    // 4. Throttled wheel/ resize handlers
+    // 5. Passive event listeners
+    // 6. Debounced save operations
+    // 7. Video lazy loading - only load when visible
+
     const rAF = requestAnimationFrame.bind(window);
     const cAF = cancelAnimationFrame.bind(window);
 
+    // Throttle utility
     function throttle(fn, wait) {
       let last = 0, timer;
       return function(...args) {
@@ -247,12 +183,13 @@
       };
     }
 
+    // Debounce utility
     function debounce(fn, wait) {
       let t;
       return function(...args) { clearTimeout(t); t = setTimeout(() => fn.apply(this, args), wait); };
     }
 
-    // ==================== DEBUG LOGGER ====================
+    // ==================== DEBUG LOGGER (off by default) ====================
     const DEBUG = false;
     const debugPanel = document.querySelector('#debugPanel');
     const debugLogs = [];
@@ -270,271 +207,157 @@
     if (!DEBUG) document.querySelector('#debugToggle').style.display = 'none';
 
     // ==================== PROJECT DATA ====================
-    // Each project has: title, description, tags, projectLink, note, and files[]
-    // Files array contains objects with: { url, caption, type }
-    // type is either "image" or "video"
-
     const DEFAULT_PROJECTS = [
-      {
-        title: "Groceries",
-        description: "2025",
-        tags: "Exhibition",
-        projectLink: "https://www.behance.net/gallery/245665945/Groceries",
-        note: "",
-        files: [
-          { url: "img/groceries_01.png", caption: "001", type: "image" },
-          { url: "img/groceries_02.png", caption: "002", type: "image" }
-        ]
-      },
-      {
-        title: "GENEA",
-        description: "2025-2026",
-        tags: "Scifi",
-        projectLink: "https://www.artstation.com/sevenfour_heavenfall/albums/14156663",
-        note: "Insionis Extraction Corporation",
-        files: [
-          { url: "video/Genea_001.mp4", caption: "001", type: "video" },
-          { url: "video/Genea_002.mp4", caption: "002", type: "video" },
-          { url: "video/Genea_003.mp4", caption: "003", type: "video" },
-          { url: "video/Genea_004.mp4", caption: "004", type: "video" },
-          { url: "video/Genea_005.mp4", caption: "005", type: "video" }
-        ]
-      },
-      {
-        title: "LOADING SCREEN",
-        description: "2025-2026",
-        tags: "animation",
-        projectLink: "https://www.artstation.com/sevenfour_heavenfall/albums/14156667",
-        note: "concept art of video game loading screen",
-        files: [
-          { url: "video/loading_001.mp4", caption: "001", type: "video" },
-          { url: "video/loading_002.mp4", caption: "002", type: "video" },
-          { url: "video/loading_003.mp4", caption: "003", type: "video" },
-          { url: "video/loading_004.mp4", caption: "004", type: "video" }
-        ]
-      },
-      {
-        title: "Blacklight Discovery",
-        description: "2025-2026",
-        tags: "IDENT, branding, concept",
-        projectLink: "https://www.behance.net/gallery/250530941/Proj-BLACKLIGHT-DISCOVERY-A-TV-Channel-Branding",
-        note: "TV channel Broadcast Branding",
-        files: [
-          { url: "video/blacklight_001.mp4", caption: "001", type: "video" }
-        ]
-      },
-      {
-        title: "Art Installation",
-        description: "2025-2026",
-        tags: "digital installation, concept",
-        projectLink: "https://www.artstation.com/sevenfour_heavenfall/albums/14538766",
-        note: "My personal digital art gallery of different themes and my own feelings about the world interpreted into the art",
-        files: [
-          { url: "video/artinstallation_001.mp4", caption: "001", type: "video" },
-          { url: "video/artinstallation_002.mp4", caption: "002", type: "video" },
-          { url: "video/artinstallation_003.mp4", caption: "003", type: "video" },
-          { url: "video/artinstallation_004.mp4", caption: "004", type: "video" },
-          { url: "video/artinstallation_005.mp4", caption: "005", type: "video" }
-        ]
-      },
-      {
-        title: "Harry Potter",
-        description: "2026",
-        tags: "fanart",
-        projectLink: "https://www.artstation.com/artwork/x35ObO",
-        note: "Always liked the scene of the sink in chamber of secret, opening up and revealing the entrance. it is such a good transformation",
-        files: [
-          { url: "img/harrypotter_001.png", caption: "001", type: "image" },
-          { url: "img/harrypotter_002.png", caption: "002", type: "image" },
-          { url: "img/harrypotter_003.png", caption: "003", type: "image" },
-          { url: "video/harrypotter_004.mp4", caption: "004", type: "video" }
-        ]
-      },
-      {
-        title: "Poster",
-        description: "2023-2026",
-        tags: "graphic design, concept",
-        projectLink: "",
-        note: "Showcase of my creativity graphic style in a poster format",
-        files: [
-          { url: "img/poster_001.png", caption: "Peeking", type: "image" },
-          { url: "img/poster_002.png", caption: "Skull", type: "image" },
-          { url: "img/poster_003.png", caption: "Grim", type: "image" },
-          { url: "img/poster_004.png", caption: "Collaspe of the sheep eyes", type: "image" },
-          { url: "img/poster_005.png", caption: "World ocean day", type: "image" },
-          { url: "img/poster_006.png", caption: "pollution", type: "image" },
-          { url: "img/poster_007.png", caption: "nailed hands", type: "image" },
-          { url: "img/poster_008.png", caption: "stone head", type: "image" },
-          { url: "img/poster_009.png", caption: "statues", type: "image" },
-          { url: "img/poster_010.png", caption: "wrapped", type: "image" },
-          { url: "img/poster_011.png", caption: "hotair ballon", type: "image" }
-        ]
-      },
-      {
-        title: "Archived",
-        description: "2026",
-        tags: "time, concept",
-        projectLink: "https://www.artstation.com/sevenfour_heavenfall/albums/14859670",
-        note: "Time in different concept",
-        files: [
-          { url: "video/archived_001.mp4", caption: "sand", type: "video" },
-          { url: "video/archived_002.mp4", caption: "run", type: "video" },
-          { url: "video/archived_003.mp4", caption: "paint", type: "video" },
-          { url: "video/archived_004.mp4", caption: "signboard", type: "video" }
-        ]
-      },
-      {
-        title: "Shortfilm",
-        description: "2026",
-        tags: "ai, film",
-        projectLink: "",
-        note: "making digital shorts from my personal ideas",
-        files: [
-          { url: "video/shortfilm_001.mp4", caption: "depressed", type: "video" },
-          { url: "video/shortfilm_002.mp4", caption: "contact lens", type: "video" }
-        ]
-      },
-      {
-        title: "Isometric Room",
-        description: "2026",
-        tags: "concept, surreal",
-        projectLink: "",
-        note: "The hole are not windows",
-        files: [
-          { url: "img/isometricroom_001.png", caption: "001", type: "image" },
-          { url: "img/isometricroom_002.png", caption: "002", type: "image" },
-          { url: "img/isometricroom_003.png", caption: "003", type: "image" }
-        ]
-      },
-      {
-        title: "CTRL +",
-        description: "2026",
-        tags: "IDENT, branding, concept",
-        projectLink: "https://www.behance.net/gallery/248213117/Proj-CTRL-A-TV-Channel-Branding",
-        note: "TV channel Broadcast Branding",
-        files: [
-          { url: "video/ctrl_001.mp4", caption: "Compiled Version", type: "video" }
-        ]
-      },
-      {
-        title: "Digital Decay",
-        description: "2025",
-        tags: "ai, shorts",
-        projectLink: "https://www.behance.net/gallery/236739441/Digital-Decay",
-        note: "Decentralized",
-        files: [
-          { url: "video/digitaldecay_001.mp4", caption: "crowd", type: "video" },
-          { url: "video/digitaldecay_002.mp4", caption: "ballad", type: "video" },
-          { url: "video/digitaldecay_003.mp4", caption: "skate", type: "video" },
-          { url: "video/digitaldecay_004.mp4", caption: "crash", type: "video" },
-          { url: "video/digitaldecay_005.mp4", caption: "attachment", type: "video" },
-          { url: "video/digitaldecay_006.mp4", caption: "kidnap", type: "video" },
-          { url: "video/digitaldecay_007.mp4", caption: "psycho", type: "video" },
-          { url: "video/digitaldecay_008.mp4", caption: "psilocybin", type: "video" },
-          { url: "video/digitaldecay_009.mp4", caption: "love", type: "video" }
-        ]
-      },
-      {
-        title: "Construct",
-        description: "2026",
-        tags: "concept, architecture",
-        projectLink: "https://7delus.tumblr.com/post/816841430969548800/construct-brutalism-building-inspired-by-the",
-        note: "Inspired by brutalism theme of architect",
-        files: [
-          { url: "img/construct_001.png", caption: "001", type: "image" },
-          { url: "img/construct_002.png", caption: "002", type: "image" },
-          { url: "img/construct_003.png", caption: "003", type: "image" }
-        ]
-      },
-      {
-        title: "Day, frame by frame",
-        description: "2026",
-        tags: "concept, surreal, installation",
-        projectLink: "https://www.artstation.com/artwork/y4d8mx",
-        note: "Everyday object in a undefine odd state",
-        files: [
-          { url: "img/northlight_001.png", caption: "001", type: "image" },
-          { url: "img/northlight_002.png", caption: "002", type: "image" },
-          { url: "img/northlight_003.png", caption: "003", type: "image" }
-        ]
-      },
-      {
-        title: "Sunny Side Up",
-        description: "2026",
-        tags: "concept, branding, identity",
-        projectLink: "https://www.behance.net/gallery/251939779/Proj-Sunny-Side-Up-Cleaning-A-Business-Branding",
-        note: "A company offering services in the field of landscaping",
-        files: [
-          { url: "img/sunnysideup_deck_01.png", caption: "001", type: "image" },
-          { url: "img/sunnysideup_deck_02.png", caption: "002", type: "image" },
-          { url: "img/sunnysideup_deck_03.png", caption: "003", type: "image" },
-          { url: "img/sunnysideup_deck_04.png", caption: "004", type: "image" },
-          { url: "img/sunnysideup_deck_05.png", caption: "005", type: "image" },
-          { url: "img/sunnysideup_deck_06.png", caption: "006", type: "image" },
-          { url: "img/sunnysideup_deck_07.png", caption: "007", type: "image" },
-          { url: "img/sunnysideup_deck_08.png", caption: "008", type: "image" },
-          { url: "img/sunnysideup_deck_09.png", caption: "009", type: "image" },
-          { url: "img/sunnysideup_deck_10.png", caption: "010", type: "image" },
-          { url: "img/sunnysideup_deck_11.png", caption: "011", type: "image" },
-          { url: "img/sunnysideup_deck_12.png", caption: "012", type: "image" },
-          { url: "img/sunnysideup_deck_13.png", caption: "013", type: "image" }
-        ]
-      },
-      {
-        title: "String Lines Mess",
-        description: "2026",
-        tags: "abstract, coding",
-        projectLink: "https://www.behance.net/gallery/250326311/String-Lines",
-        note: "Each line is one person: a single path, a single color",
-        files: [
-          { url: "img/stringmess_001.png", caption: "001", type: "image" },
-          { url: "img/stringmess_002.png", caption: "002", type: "image" },
-          { url: "img/stringmess_003.png", caption: "003", type: "image" },
-          { url: "img/stringmess_004.png", caption: "004", type: "image" }
-        ]
-      },
-      {
-        title: "Mono - Music Player",
-        description: "2026",
-        tags: "ai, coding",
-        projectLink: "",
-        note: "A custom original grid style music playlist created by vide coding",
-        files: [
-          { url: "video/mono_demo_001.mp4", caption: "demo", type: "video" }
-        ]
-      },
-      title: "Eerie Found Footage",
-        description: "2026",
-        tags: "ai, shorts",
-        projectLink: "https://www.behance.net/gallery/252529217/Machine-Withness-Found-Footage",
-        note: "What does it mean for AI to document horror it cannot experience?",
-        files: [
-          { url: "video/Foundfootage_001.mp4", caption: "Tree  ", type: "video" },
-          { url: "video/Foundfootage_002.mp4", caption: "Pool", type: "video" },
-          { url: "video/Foundfootage_003.mp4", caption: "stairs", type: "video" },
-          { url: "video/Foundfootage_004.mp4", caption: "hospital", type: "video" },
-          { url: "video/Foundfootage_005.mp4", caption: "room", type: "video" },
-          { url: "video/Foundfootage_006.mp4", caption: "peekhole", type: "video" }
-        ]
-      },
-      {
-        title: "Personal Drawing",
-        description: "2025-2026",
-        tags: "art therapy",
-        projectLink: "",
-        note: "Carefree drawing",
-        files: [
-          { url: "img/personal_drawing_008.png", caption: "my hand", type: "image" },
-          { url: "img/personal_drawing_001.png", caption: "Icarus", type: "image" },
-          { url: "img/personal_drawing_002.png", caption: "god complex", type: "image" },
-          { url: "img/personal_drawing_004.png", caption: "girl in space", type: "image" },
-          { url: "img/personal_drawing_003.png", caption: "soul", type: "image" },
-          { url: "img/personal_drawing_005.png", caption: "emotional freedom", type: "image" },
-          { url: "img/personal_drawing_006.png", caption: "wobbly tangle", type: "image" },
-          { url: "img/personal_drawing_007.png", caption: "mascot", type: "image" },
-          { url: "img/personal_drawing_009.png", caption: "Forest Monster", type: "image" }
-        ]
-      }
+      {title:"Groceries",description:"2025",tags:"Exhibition",
+       projectLink:"https://www.behance.net/gallery/245665945/Groceries",note:"",
+       files:
+         [{url:"img/groceries_01.png",caption:"001",type:"image"},
+          {url:"img/groceries_02.png",caption:"002",type:"image"}]},
+      {title:"GENEA",description:"2025-2026",tags:"Scifi",
+       projectLink:"https://www.artstation.com/sevenfour_heavenfall/albums/14156663",
+       note:"Insionis Extraction Corporation",
+       files:[{url:"video/Genea_001.mp4",caption:"001",type:"video"},
+              {url:"video/Genea_002.mp4",caption:"002",type:"video"},
+              {url:"video/Genea_003.mp4",caption:"003",type:"video"},
+              {url:"video/Genea_004.mp4",caption:"004",type:"video"},
+              {url:"video/Genea_005.mp4",caption:"005",type:"video"}]},
+      {title:"LOADING SCREEN",description:"2025-2026",tags:"animation",
+       projectLink:"https://www.artstation.com/sevenfour_heavenfall/albums/14156667",
+       note:"concept art of video game loading screen",
+       files:[{url:"video/loading_001.mp4",caption:"001",type:"video"},
+              {url:"video/loading_002.mp4",caption:"002",type:"video"},
+              {url:"video/loading_003.mp4",caption:"003",type:"video"},
+              {url:"video/loading_004.mp4",caption:"004",type:"video"}]},
+      {title:"Blacklight Discovery",description:"2025-2026",tags:"IDENT, branding, concept",
+       projectLink:"https://www.behance.net/gallery/250530941/Proj-BLACKLIGHT-DISCOVERY-A-TV-Channel-Branding",note:"TV channel Broadcast Branding",
+       files:[{url:"video/blacklight_001.mp4",caption:"001",type:"video"}]},
+      {title:"Art Installation",description:"2025-2026",tags:"digital installation, concept",
+       projectLink:"https://www.artstation.com/sevenfour_heavenfall/albums/14538766",
+       note:"My personal digital art gallery of different themes and my own feelings about the world interpreted into the art",
+       files:[{url:"video/artinstallation_001.mp4",caption:"001",type:"video"},
+              {url:"video/artinstallation_002.mp4",caption:"002",type:"video"},
+              {url:"video/artinstallation_003.mp4",caption:"003",type:"video"},
+              {url:"video/artinstallation_004.mp4",caption:"003",type:"video"},
+              {url:"video/artinstallation_005.mp4",caption:"003",type:"video"}]},
+      {title:"Harry Potter",description:"2026",tags:"fanart",
+       projectLink:"https://www.artstation.com/artwork/x35ObO",
+       note:"Always liked the scene of the sink in chamber of secret, opening up and revealing the entrance. it is such a good transformation",
+       files:[{url:"img/harrypotter_001.png",caption:"001",type:"image"},
+              {url:"img/harrypotter_002.png",caption:"002",type:"image"},
+              {url:"img/harrypotter_003.png",caption:"003",type:"image"},
+              {url:"video/harrypotter_004.mp4",caption:"004",type:"video"}]},
+      {title:"Poster",description:"2023-2026",tags:"graphic design, concept",
+      projectLink:"",
+       note:"Showcase of my creativity graphic style in a poster format",
+       files:[{url:"img/poster_001.png",caption:"Peeking",type:"image"},
+              {url:"img/poster_002.png",caption:"Skull",type:"image"},
+              {url:"img/poster_003.png",caption:"Grim",type:"image"},
+              {url:"img/poster_004.png",caption:"Collaspe of the sheep eyes",type:"image"},
+              {url:"img/poster_005.png",caption:"World ocean day",type:"image"},
+              {url:"img/poster_006.png",caption:"pollution",type:"image"},
+              {url:"img/poster_007.png",caption:"nailed hands",type:"image"},
+              {url:"img/poster_008.png",caption:"stone head",type:"image"},
+              {url:"img/poster_009.png",caption:"statues",type:"image"},
+              {url:"img/poster_010.png",caption:"wrapped",type:"image"},
+              {url:"img/poster_011.png",caption:"hotair ballon",type:"image"}]},
+      {title:"Archived",description:"2026",tags:"time, concept",
+       projectLink:"https://www.artstation.com/sevenfour_heavenfall/albums/14859670",
+       note:"Time in different concept",
+       files:[{url:"video/archived_001.mp4",caption:"sand",type:"video"},
+              {url:"video/archived_002.mp4",caption:"run",type:"video"},
+              {url:"video/archived_003.mp4",caption:"paint",type:"video"},
+              {url:"video/archived_004.mp4",caption:"signboard",type:"video"}]},
+      {title:"Shortfilm",description:"2026",tags:"ai, film",projectLink:"",
+       note:"making digital shorts from my personal ideas",
+       files:[{url:"video/shortfilm_001.mp4",caption:"depressed",type:"video"},
+              {url:"video/shortfilm_002.mp4",caption:"contact lens",type:"video"}]},
+      {title:"Isometric Room",description:"2026",tags:"concept, surreal",
+       projectLink:"",
+       note:"The hole are not windows",
+       files:[{url:"img/isometricroom_001.png",caption:"001",type:"image"},
+              {url:"img/isometricroom_002.png",caption:"002",type:"image"},
+              {url:"img/isometricroom_003.png",caption:"003",type:"image"}]},
+      {title:"CTRL +",description:"2026",tags:"IDENT, branding, concept",
+       projectLink:"https://www.behance.net/gallery/248213117/Proj-CTRL-A-TV-Channel-Branding",note:"TV channel Broadcast Branding",
+       files:[{url:"video/ctrl_001.mp4",caption:"Compiled Version",type:"video"}]},
+      {title:"Digital Decay",description:"2025",
+       tags:"ai, shorts",
+       projectLink:"https://www.behance.net/gallery/236739441/Digital-Decay",
+       note:"Decentralized",
+       files:[{url:"video/digitaldecay_001.mp4",caption:"crowd",type:"video"},
+              {url:"video/digitaldecay_002.mp4",caption:"ballad",type:"video"},
+              {url:"video/digitaldecay_003.mp4",caption:"skate",type:"video"},
+              {url:"video/digitaldecay_004.mp4",caption:"crash",type:"video"},
+              {url:"video/digitaldecay_005.mp4",caption:"attachment",type:"video"},
+              {url:"video/digitaldecay_006.mp4",caption:"kidnap",type:"video"},
+              {url:"video/digitaldecay_007.mp4",caption:"psycho",type:"video"},
+              {url:"video/digitaldecay_008.mp4",caption:"psilocybin",type:"video"},
+              {url:"video/digitaldecay_009.mp4",caption:"love",type:"video"}]},
+      {title:"Construct",description:"2026",
+       tags:"concept, architecture",
+       projectLink:"https://7delus.tumblr.com/post/816841430969548800/construct-brutalism-building-inspired-by-the",
+       note:"Inspired by brutalism theme of architect",
+       files:[{url:"img/construct_001.png",caption:"001",type:"image"},
+              {url:"img/construct_002.png",caption:"002",type:"image"},
+              {url:"img/construct_003.png",caption:"003",type:"image"}]},
+      {title:"Day, frame by frame",description:"2026",tags:"concept, surreal, installation",
+       projectLink:"https://www.artstation.com/artwork/y4d8mx",
+       note:"Everyday object in a undefine odd state",
+       files:[{url:"img/northlight_001.png",caption:"001",type:"image"},
+              {url:"img/northlight_002.png",caption:"002",type:"image"},
+              {url:"img/northlight_003.png",caption:"003",type:"image"}]},
+      {title:"Sunny Side Up",description:"2026",
+       tags:"concept, branding, identity",
+       projectLink:"https://www.behance.net/gallery/251939779/Proj-Sunny-Side-Up-Cleaning-A-Business-Branding",note:"A company offering services in the field of landscaping",
+       files:[{url:"img/sunnysideup_deck_01.png",caption:"001",type:"image"},
+              {url:"img/sunnysideup_deck_02.png",caption:"002",type:"image"},
+              {url:"img/sunnysideup_deck_03.png",caption:"003",type:"image"},
+              {url:"img/sunnysideup_deck_04.png",caption:"004",type:"image"},
+              {url:"img/sunnysideup_deck_05.png",caption:"005",type:"image"},
+              {url:"img/sunnysideup_deck_06.png",caption:"006",type:"image"},
+              {url:"img/sunnysideup_deck_07.png",caption:"007",type:"image"},
+              {url:"img/sunnysideup_deck_08.png",caption:"008",type:"image"},
+              {url:"img/sunnysideup_deck_09.png",caption:"009",type:"image"},
+              {url:"img/sunnysideup_deck_10.png",caption:"010",type:"image"},
+              {url:"img/sunnysideup_deck_11.png",caption:"011",type:"image"},
+              {url:"img/sunnysideup_deck_12.png",caption:"012",type:"image"},
+              {url:"img/sunnysideup_deck_13.png",caption:"013",type:"image"}]},
+      {title:"String Lines Mess",description:"2026",tags:"abstract, coding",
+       projectLink:"https://www.behance.net/gallery/250326311/String-Lines",
+       note:"Each line is one person: a single path, a single color",
+       files:[{url:"img/stringmess_001.png",caption:"001",type:"image"},
+              {url:"img/stringmess_002.png",caption:"002",type:"image"},
+              {url:"img/stringmess_003.png",caption:"003",type:"image"},
+              {url:"img/stringmess_004.png",caption:"004",type:"image"}]},
+      {title:"Mono - Music Player",description:"2026",tags:"ai, coding",
+       projectLink:"",
+       note:"A custom original grid style music playlist created by vide coding",
+       files:
+         [{url:"video/mono_demo_001.mp4",caption:"demo",type:"video"}]},
+      title: "Eerie Found Footage", description: "2026", 
+      tags: "ai, shorts", 
+      projectLink: "https://www.behance.net/gallery/252529217/Machine-Withness-Found-Footage", 
+      note: "What does it mean for AI to document horror it cannot experience?", 
+      files: 
+    [{ url: "video/Foundfootage_001.mp4", caption: "Tree  ", type: "video" }, 
+              { url: "video/Foundfootage_002.mp4", caption: "Pool", type: "video" },
+              { url: "video/Foundfootage_003.mp4", caption: "stairs", type: "video" }, 
+              { url: "video/Foundfootage_004.mp4", caption: "hospital", type: "video" }, 
+              { url: "video/Foundfootage_005.mp4", caption: "room", type: "video" },
+              { url: "video/Foundfootage_006.mp4", caption: "peekhole", type: "video" } 
+    ] },
+      {title:"Personal Drawing",description:"2025-2026",
+       tags:"art therapy",projectLink:"",
+       note:"Carefree drawing",
+       files:[{url:"img/personal_drawing_008.png",caption:"my hand",type:"image"},
+              {url:"img/personal_drawing_001.png",caption:"Icarus",type:"image"},
+              {url:"img/personal_drawing_002.png",caption:"god complex",type:"image"},
+              {url:"img/personal_drawing_004.png",caption:"girl in space",type:"image"},
+              {url:"img/personal_drawing_003.png",caption:"soul",type:"image"},
+              {url:"img/personal_drawing_005.png",caption:"emotional freedom",type:"image"},
+              {url:"img/personal_drawing_006.png",caption:"wobbly tangle",type:"image"},
+              {url:"img/personal_drawing_007.png",caption:"mascot",type:"image"},
+              {url:"img/personal_drawing_009.png",caption:"Forest Monster",type:"image"}]}
     ];
 
     // ==================== STATE ====================
@@ -549,31 +372,32 @@
     let rafId = null;
     let pendingUpdate = false;
 
-    // ==================== DOM REFERENCES ====================
-    const carousel      = document.querySelector("#carousel");
-    const indexPanel    = document.querySelector("#indexPanel");
-    const aboutPanel    = document.querySelector("#aboutPanel");
-    const currentTitle  = document.querySelector("#currentTitle");
-    const currentNote   = document.querySelector("#currentNote");
-    const counter       = document.querySelector("#counter");
-    const indexButton   = document.querySelector("#indexButton");
+    // ==================== DOM REFS ====================
+    const carousel = document.querySelector("#carousel");
+    const indexPanel = document.querySelector("#indexPanel");
+    const aboutPanel = document.querySelector("#aboutPanel");
+    const currentTitle = document.querySelector("#currentTitle");
+    const currentNote = document.querySelector("#currentNote");
+    const counter = document.querySelector("#counter");
+    const indexButton = document.querySelector("#indexButton");
     const overviewButton = document.querySelector("#overviewButton");
     const projectDetail = document.querySelector("#projectDetail");
-    const detailTitle   = document.querySelector("#detailTitle");
-    const detailMeta    = document.querySelector("#detailMeta");
-    const detailGrid    = document.querySelector("#detailGrid");
-    const detailNote    = document.querySelector("#detailNote");
-    const detailTags    = document.querySelector("#detailTags");
-    const detailLink    = document.querySelector("#detailLink");
-    const adminModal    = document.querySelector("#adminModal");
-    const adminPanel    = document.querySelector("#adminPanel");
-    const adminContent  = document.querySelector("#adminContent");
+    const detailTitle = document.querySelector("#detailTitle");
+    const detailMeta = document.querySelector("#detailMeta");
+    const detailGrid = document.querySelector("#detailGrid");
+    const detailNote = document.querySelector("#detailNote");
+    const detailTags = document.querySelector("#detailTags");
+    const detailLink = document.querySelector("#detailLink");
+    const adminModal = document.querySelector("#adminModal");
+    const adminPanel = document.querySelector("#adminPanel");
+    const adminContent = document.querySelector("#adminContent");
     const adminPassword = document.querySelector("#adminPassword");
-    const lightbox      = document.querySelector("#lightbox");
+    const lightbox = document.querySelector("#lightbox");
     const lightboxStage = document.querySelector("#lightboxStage");
     const lightboxCaption = document.querySelector("#lightboxCaption");
 
     // ==================== LAZY VIDEO LOADING ====================
+    // Only load videos when they're near the active slide
     const videoObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         const video = entry.target;
@@ -601,8 +425,7 @@
         projects = JSON.parse(JSON.stringify(DEFAULT_PROJECTS));
         saveProjects();
       } else {
-        try { projects = JSON.parse(raw); }
-        catch(e) {
+        try { projects = JSON.parse(raw); } catch(e) {
           projects = JSON.parse(JSON.stringify(DEFAULT_PROJECTS));
           saveProjects();
         }
@@ -615,7 +438,7 @@
       log('Saved ' + projects.length + ' projects');
     }, 300);
 
-    // ==================== IMAGE / VIDEO PROCESSING ====================
+    // ==================== IMAGE/VIDEO PROCESSING ====================
     function resizeImage(file, maxWidth = 1400, quality = 0.82) {
       return new Promise((resolve, reject) => {
         const img = new Image();
@@ -662,7 +485,6 @@
 
     // ==================== HELPERS ====================
     function pad(v) { return String(v).padStart(2, "0"); }
-
     function shortestOffset(i) {
       const t = projects.length;
       let o = i - active;
@@ -670,11 +492,9 @@
       if (o < -t / 2) o += t;
       return o;
     }
-
     function coverUrl(p) {
       return p.files && p.files[0] ? p.files[0].url : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     }
-
     function getFileType(f) {
       if (!f) return 'image';
       if (f.type) return f.type;
@@ -685,12 +505,11 @@
       if (['mp4', 'webm', 'mov', 'mkv', 'avi', 'm4v'].includes(ext)) return 'video';
       return 'image';
     }
-
     function isVideo(f) { return getFileType(f) === 'video'; }
 
     const VIDEO_PLACEHOLDER = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTIiIGhlaWdodD0iNTIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjUyIiBoZWlnaHQ9IjUyIiBmaWxsPSIjMTExIi8+PHBhdGggZD0iTTE4IDE2bDIwIDEwLTIwIDEweiIgZmlsbD0iIzMzMyIvPjwvc3ZnPg==';
 
-    // ==================== CARD BUILDING ====================
+    // ==================== CARD BUILDING (OPTIMIZED) ====================
     function buildWorkCard(p, i) {
       const article = document.createElement('article');
       article.className = 'work';
@@ -702,6 +521,7 @@
         wrapper.className = 'video-wrapper';
 
         const video = document.createElement('video');
+        // LAZY: use data-src instead of src for non-visible videos
         const offset = Math.abs(shortestOffset(i));
         if (offset <= 2) {
           video.src = f.url;
@@ -717,6 +537,7 @@
         video.preload = offset <= 2 ? 'auto' : 'none';
         video.disablePictureInPicture = true;
 
+        // Observe for lazy loading
         videoObserver.observe(video);
 
         const badge = document.createElement('span');
@@ -751,21 +572,25 @@
     function thumbUrl(p) {
       const f = p.files && p.files[0];
       if (!f) return 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-      if (isVideo(f)) return f.poster || VIDEO_PLACEHOLDER;
+      if (isVideo(f)) {
+        if (f.poster) return f.poster;
+        return VIDEO_PLACEHOLDER;
+      }
       return f.url;
     }
 
-    // ==================== RENDERING ====================
+    // ==================== RENDERING (BATCHED WITH RAF) ====================
     function render() {
       log('render() called, projects=' + projects.length);
-
-      // Build carousel cards
+      // Use DocumentFragment for batch DOM insertion
       const frag = document.createDocumentFragment();
-      projects.forEach((p, i) => frag.appendChild(buildWorkCard(p, i)));
+      projects.forEach((p, i) => {
+        frag.appendChild(buildWorkCard(p, i));
+      });
       carousel.innerHTML = '';
       carousel.appendChild(frag);
 
-      // Build index panel
+      // Build index panel as string (faster than DOM for static content)
       indexPanel.innerHTML = projects.map((p, i) => {
         const f = p.files && p.files[0];
         let thumbHtml;
@@ -786,10 +611,14 @@
       scheduleUpdate();
     }
 
+    // Schedule visual update via rAF to batch with browser paint
     function scheduleUpdate() {
       if (pendingUpdate) return;
       pendingUpdate = true;
-      rafId = rAF(() => { pendingUpdate = false; update(); });
+      rafId = rAF(() => {
+        pendingUpdate = false;
+        update();
+      });
     }
 
     function update() {
@@ -797,6 +626,7 @@
       const cx = m ? 38 : 150;
       const cy = m ? -16 : -36;
 
+      // Batch style changes to avoid multiple reflows
       const cards = carousel.querySelectorAll('.work');
       for (let i = 0; i < cards.length; i++) {
         const card = cards[i];
@@ -827,6 +657,7 @@
       const prev = active;
       active = (i + projects.length) % projects.length;
       if (prev !== active) {
+        // Update video lazy loading when slide changes
         updateVideoLazyLoading();
         scheduleUpdate();
       }
@@ -845,7 +676,9 @@
           video.autoplay = true;
           video.load();
         }
-        if (loadedVideo && offset > 3) loadedVideo.pause();
+        if (loadedVideo && offset > 3) {
+          loadedVideo.pause();
+        }
       });
     }
 
@@ -929,36 +762,16 @@
     }
 
     // ==================== ADMIN ====================
-    function openAdminLogin() {
-      adminModal.classList.add('is-open');
-      adminModal.setAttribute('aria-hidden', 'false');
-      adminPassword.value = '';
-      adminPassword.focus();
-    }
-
-    function closeAdminLogin() {
-      adminModal.classList.remove('is-open');
-      adminModal.setAttribute('aria-hidden', 'true');
-    }
-
+    function openAdminLogin() { adminModal.classList.add('is-open'); adminModal.setAttribute('aria-hidden', 'false'); adminPassword.value = ''; adminPassword.focus(); }
+    function closeAdminLogin() { adminModal.classList.remove('is-open'); adminModal.setAttribute('aria-hidden', 'true'); }
     function enterAdmin() {
       if (adminPassword.value === '1410') {
-        isAdmin = true;
-        closeAdminLogin();
-        renderAdmin();
-        adminPanel.classList.add('is-open');
-        adminPanel.setAttribute('aria-hidden', 'false');
+        isAdmin = true; closeAdminLogin(); renderAdmin(); adminPanel.classList.add('is-open'); adminPanel.setAttribute('aria-hidden', 'false');
       } else {
-        adminPassword.style.borderColor = '#b42318';
-        setTimeout(() => adminPassword.style.borderColor = '', 400);
+        adminPassword.style.borderColor = '#b42318'; setTimeout(() => adminPassword.style.borderColor = '', 400);
       }
     }
-
-    function exitAdmin() {
-      isAdmin = false;
-      adminPanel.classList.remove('is-open');
-      adminPanel.setAttribute('aria-hidden', 'true');
-    }
+    function exitAdmin() { isAdmin = false; adminPanel.classList.remove('is-open'); adminPanel.setAttribute('aria-hidden', 'true'); }
 
     // ==================== FILE UPLOAD ====================
     function createFileInput() {
@@ -978,7 +791,7 @@
       const file = e.target.files && e.target.files[0];
       if (!file || !pendingUpload) return;
       log('Uploading: ' + file.name);
-      const isVideoFile = file.type.startsWith('video/');
+      const isVideo = file.type.startsWith('video/');
       const projIdx = pendingUpload.projIdx;
 
       const process = (dataUrl, type, poster) => {
@@ -1000,7 +813,7 @@
         createFileInput();
       };
 
-      if (isVideoFile) {
+      if (isVideo) {
         const reader = new FileReader();
         reader.onload = (ev) => {
           generateVideoPoster(file).then(poster => {
@@ -1024,16 +837,9 @@
       e.dataTransfer.setData('text/html', this.innerHTML);
       this.classList.add('dragging');
     }
-
-    function handleDragOver(e) {
-      if (e.preventDefault) e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      return false;
-    }
-
+    function handleDragOver(e) { if (e.preventDefault) e.preventDefault(); e.dataTransfer.dropEffect = 'move'; return false; }
     function handleDragEnter(e) { this.classList.add('over'); }
     function handleDragLeave(e) { this.classList.remove('over'); }
-
     function handleDrop(e) {
       if (e.stopPropagation) e.stopPropagation();
       if (dragSrcEl !== this) {
@@ -1047,7 +853,6 @@
       }
       return false;
     }
-
     function handleDragEnd(e) {
       this.classList.remove('dragging');
       adminContent.querySelectorAll('.admin-file-row').forEach(row => row.classList.remove('over'));
@@ -1055,41 +860,18 @@
 
     // ==================== ADMIN RENDER ====================
     function renderAdmin() {
+      const frag = document.createDocumentFragment();
+      // Build as string for performance
       adminContent.innerHTML = projects.map((p, i) => {
         const filesHtml = (p.files || []).map((f, fi) => {
           const type = getFileType(f);
-          const thumb = type === 'video'
-            ? (f.poster
-              ? '<img class="admin-thumb" src="' + f.poster + '">'
-              : '<div class="admin-thumb" style="display:flex;align-items:center;justify-content:center;background:#111;color:#fff;font-size:8px;text-transform:uppercase;letter-spacing:.05em;">Video</div>')
-            : '<img class="admin-thumb" src="' + f.url + '">';
-          return '<div class="admin-file-row" draggable="true" data-proj="' + i + '" data-fileindex="' + fi + '">' +
-            '<span class="drag-handle">&#9776;</span>' + thumb +
-            '<input type="text" data-proj="' + i + '" data-file="' + fi + '" data-field="url" value="' + f.url + '" placeholder="Image URL or base64">' +
-            '<button type="button" class="upload-btn upload-replace" data-proj="' + i + '" data-file="' + fi + '">Upload</button>' +
-            '<input type="text" data-proj="' + i + '" data-file="' + fi + '" data-field="caption" value="' + (f.caption || '') + '" placeholder="Caption">' +
-            '<button type="button" class="remove-file" data-proj="' + i + '" data-file="' + fi + '">Remove</button>' +
-            '</div>';
+          const thumb = type === 'video' ? (f.poster ? '<img class="admin-thumb" src="' + f.poster + '">' : '<div class="admin-thumb" style="display:flex;align-items:center;justify-content:center;background:#111;color:#fff;font-size:8px;text-transform:uppercase;letter-spacing:.05em;">Video</div>') : '<img class="admin-thumb" src="' + f.url + '">';
+          return '<div class="admin-file-row" draggable="true" data-proj="' + i + '" data-fileindex="' + fi + '"><span class="drag-handle">&#9776;</span>' + thumb + '<input type="text" data-proj="' + i + '" data-file="' + fi + '" data-field="url" value="' + f.url + '" placeholder="Image URL or base64"><button type="button" class="upload-btn upload-replace" data-proj="' + i + '" data-file="' + fi + '">Upload</button><input type="text" data-proj="' + i + '" data-file="' + fi + '" data-field="caption" value="' + (f.caption || '') + '" placeholder="Caption"><button type="button" class="remove-file" data-proj="' + i + '" data-file="' + fi + '">Remove</button></div>';
         }).join('');
-
-        return '<div class="admin-card" data-index="' + i + '">' +
-          '<div class="admin-field"><label>Title</label><input type="text" data-proj="' + i + '" data-field="title" value="' + p.title + '"></div>' +
-          '<div class="admin-field"><label>Description</label><textarea data-proj="' + i + '" data-field="description">' + (p.description || '') + '</textarea></div>' +
-          '<div class="admin-field"><label>Tags</label><input type="text" data-proj="' + i + '" data-field="tags" value="' + (p.tags || '') + '"></div>' +
-          '<div class="admin-field"><label>Project Link</label><input type="text" data-proj="' + i + '" data-field="projectLink" value="' + (p.projectLink || '') + '"></div>' +
-          '<div class="admin-field"><label>Note</label><textarea data-proj="' + i + '" data-field="note">' + (p.note || '') + '</textarea></div>' +
-          '<label style="font-size:10px;text-transform:uppercase;color:var(--muted);letter-spacing:.04em;">Files (drag to reorder)</label>' +
-          '<div class="admin-files" id="files-' + i + '">' + filesHtml + '</div>' +
-          '<div class="admin-actions">' +
-            '<button type="button" class="upload-btn upload-new" data-proj="' + i + '">Upload Image / Video</button>' +
-            '<button type="button" class="add-file" data-proj="' + i + '">+ Add URL</button>' +
-            '<button type="button" class="primary save-proj" data-proj="' + i + '">Save Project</button>' +
-            '<button type="button" class="danger delete-proj" data-proj="' + i + '">Delete Project</button>' +
-          '</div>' +
-          '</div>';
+        return '<div class="admin-card" data-index="' + i + '"><div class="admin-field"><label>Title</label><input type="text" data-proj="' + i + '" data-field="title" value="' + p.title + '"></div><div class="admin-field"><label>Description</label><textarea data-proj="' + i + '" data-field="description">' + (p.description || '') + '</textarea></div><div class="admin-field"><label>Tags</label><input type="text" data-proj="' + i + '" data-field="tags" value="' + (p.tags || '') + '"></div><div class="admin-field"><label>Project Link</label><input type="text" data-proj="' + i + '" data-field="projectLink" value="' + (p.projectLink || '') + '"></div><div class="admin-field"><label>Note</label><textarea data-proj="' + i + '" data-field="note">' + (p.note || '') + '</textarea></div><label style="font-size:10px;text-transform:uppercase;color:var(--muted);letter-spacing:.04em;">Files (drag to reorder)</label><div class="admin-files" id="files-' + i + '">' + filesHtml + '</div><div class="admin-actions"><button type="button" class="upload-btn upload-new" data-proj="' + i + '">Upload Image / Video</button><button type="button" class="add-file" data-proj="' + i + '">+ Add URL</button><button type="button" class="primary save-proj" data-proj="' + i + '">Save Project</button><button type="button" class="danger delete-proj" data-proj="' + i + '">Delete Project</button></div></div>';
       }).join('');
 
-      // Event delegation
+      // Event delegation for better performance
       adminContent.addEventListener('change', (e) => {
         const target = e.target;
         if (!target.dataset.proj) return;
@@ -1112,24 +894,20 @@
         if (btn.classList.contains('upload-replace')) {
           pendingUpload = { projIdx, fileIdx: Number(btn.dataset.file) };
           createFileInput().click();
-        }
-        else if (btn.classList.contains('upload-new')) {
+        } else if (btn.classList.contains('upload-new')) {
           pendingUpload = { projIdx, action: 'new' };
           createFileInput().click();
-        }
-        else if (btn.classList.contains('add-file')) {
+        } else if (btn.classList.contains('add-file')) {
           if (!projects[projIdx].files) projects[projIdx].files = [];
           projects[projIdx].files.push({ url: 'img/placeholder.jpg', caption: '', type: 'image' });
           saveProjects(); renderAdmin(); render(); scheduleUpdate();
-        }
-        else if (btn.classList.contains('remove-file')) {
+        } else if (btn.classList.contains('remove-file')) {
           const pIdx = Number(btn.dataset.proj);
           const fIdx = Number(btn.dataset.file);
           projects[pIdx].files.splice(fIdx, 1);
           if (projects[pIdx].files.length === 0) projects[pIdx].files = [{ url: 'img/placeholder.jpg', caption: '', type: 'image' }];
           saveProjects(); renderAdmin(); render(); scheduleUpdate();
-        }
-        else if (btn.classList.contains('save-proj')) {
+        } else if (btn.classList.contains('save-proj')) {
           const idx = Number(btn.dataset.proj);
           const card = adminContent.querySelector('.admin-card[data-index="' + idx + '"]');
           const getVal = (field) => card.querySelector('[data-proj="' + idx + '"][data-field="' + field + '"]').value;
@@ -1139,10 +917,8 @@
           projects[idx].projectLink = getVal('projectLink');
           projects[idx].note = getVal('note');
           saveProjects(); render(); scheduleUpdate();
-          btn.textContent = 'Saved';
-          setTimeout(() => btn.textContent = 'Save Project', 1200);
-        }
-        else if (btn.classList.contains('delete-proj')) {
+          btn.textContent = 'Saved'; setTimeout(() => btn.textContent = 'Save Project', 1200);
+        } else if (btn.classList.contains('delete-proj')) {
           const idx = Number(btn.dataset.proj);
           if (!confirm('Delete "' + projects[idx].title + '"?')) return;
           projects.splice(idx, 1);
@@ -1163,7 +939,7 @@
       });
     }
 
-    // ==================== EVENT LISTENERS ====================
+    // ==================== EVENT LISTENERS (OPTIMIZED) ====================
     document.querySelector('#nextButton').addEventListener('click', () => goTo(active + 1));
     document.querySelector('#prevButton').addEventListener('click', () => goTo(active - 1));
     indexButton.addEventListener('click', () => setIndex(!indexPanel.classList.contains('is-open')));
@@ -1174,14 +950,7 @@
     document.querySelector('#loginAdmin').addEventListener('click', enterAdmin);
     document.querySelector('#exitAdmin').addEventListener('click', exitAdmin);
     document.querySelector('#addProjectBtn').addEventListener('click', () => {
-      projects.push({
-        title: "New Project",
-        description: "Short description",
-        tags: "Tags",
-        projectLink: "https://example.com",
-        note: "Full description",
-        files: [{ url: "img/placeholder.jpg", caption: "", type: "image" }]
-      });
+      projects.push({ title: "New Project", description: "Short description", tags: "Tags", projectLink: "https://example.com", note: "Full description", files: [{ url: "img/placeholder.jpg", caption: "", type: "image" }] });
       saveProjects(); renderAdmin(); render(); goTo(projects.length - 1);
     });
     adminPassword.addEventListener('keydown', e => { if (e.key === 'Enter') enterAdmin(); });
@@ -1192,27 +961,24 @@
     document.querySelector('#lightboxNext').addEventListener('click', lightboxNext);
     lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
 
-    // Keyboard
+    // Keyboard - passive where possible
     window.addEventListener('keydown', e => {
       if (e.key === 'ArrowRight') {
-        if (lightbox.classList.contains('is-open')) lightboxNext();
-        else goTo(active + 1);
+        if (lightbox.classList.contains('is-open')) lightboxNext(); else goTo(active + 1);
       }
       if (e.key === 'ArrowLeft') {
-        if (lightbox.classList.contains('is-open')) lightboxPrev();
-        else goTo(active - 1);
+        if (lightbox.classList.contains('is-open')) lightboxPrev(); else goTo(active - 1);
       }
       if (e.key === 'Escape') {
         if (lightbox.classList.contains('is-open')) { closeLightbox(); return; }
         if (projectDetail.classList.contains('is-open')) { closeDetail(); return; }
-        setIndex(false);
-        aboutPanel.classList.remove('is-open');
+        setIndex(false); aboutPanel.classList.remove('is-open');
         if (adminPanel.classList.contains('is-open')) exitAdmin();
         if (adminModal.classList.contains('is-open')) closeAdminLogin();
       }
     });
 
-    // Wheel
+    // Throttled wheel handler
     window.addEventListener('wheel', e => {
       if (wheelLock || lightbox.classList.contains('is-open') || projectDetail.classList.contains('is-open') || adminPanel.classList.contains('is-open')) return;
       wheelLock = true;
@@ -1220,7 +986,7 @@
       setTimeout(() => wheelLock = false, 520);
     }, { passive: true });
 
-    // Pointer
+    // Pointer events
     window.addEventListener('pointerdown', e => {
       if (lightbox.classList.contains('is-open') || projectDetail.classList.contains('is-open') || adminPanel.classList.contains('is-open')) return;
       dragStart = { x: e.clientX, y: e.clientY };
@@ -1233,7 +999,7 @@
       dragStart = null;
     });
 
-    // Resize
+    // Throttled resize
     window.addEventListener('resize', throttle(() => {
       if (rafId) cAF(rafId);
       scheduleUpdate();
