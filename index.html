@@ -24,7 +24,13 @@
     .project-info p,.project-info h1{margin:0}
     .counter{font-size:11px;color:var(--muted);text-transform:uppercase}
     .current-title{font-size:clamp(34px,7vw,94px);line-height:.85;text-transform:uppercase;max-width:9ch}
-    .current-note{width:min(360px,92vw);font-size:13px;line-height:1.35;color:rgba(17,17,15,.72)}
+    .current-note{
+  width:min(360px,92vw);
+  font-size:13px;
+  line-height:1.35;
+  color:rgba(17,17,15,.72);
+  white-space:pre-line;
+}
     .controls{position:fixed;z-index:22;right:clamp(8px,1vw,14px);bottom:clamp(8px,1vw,14px);display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--line);border-radius:6px;background:var(--glass);backdrop-filter:blur(16px)}
     .icon-button,.mode-button{min-width:42px;height:42px;display:inline-grid;place-items:center;border-radius:4px;color:var(--muted);text-transform:uppercase;font-size:10px;transition:background .16s,color .16s}
     .mode-button{width:82px}
@@ -47,7 +53,13 @@
     .detail-media img,.detail-media video{max-width:100%;max-height:100%;object-fit:contain;display:block}
     .detail-caption{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:linear-gradient(0deg,rgba(17,17,15,.65),transparent);color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:.02em}
     .detail-body{padding:0 clamp(12px,2vw,28px) 48px;max-width:760px}
-    .detail-note{font-size:14px;line-height:1.6;color:rgba(17,17,15,.72);margin:0}
+    .detail-note{
+  font-size:14px;
+  line-height:1.6;
+  color:rgba(17,17,15,.72);
+  margin:0;
+  white-space:pre-line;
+}
     .detail-meta{font-size:11px;color:var(--muted);text-transform:uppercase;margin-top:12px}
     .detail-link{display:inline-block;margin-top:12px;font-size:12px;color:var(--ink);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--line);padding-bottom:2px;text-decoration:none}
     .lightbox{position:fixed;inset:0;z-index:60;background:rgba(17,17,15,.94);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;will-change:opacity}
@@ -211,7 +223,7 @@
     const DEFAULT_PROJECTS = [
       {title:"Groceries",description:"2025",tags:"Exhibition",
        projectLink:"https://www.behance.net/gallery/245665945/Groceries",
-       note:"",
+       note:'This artwork is inspired by something very ordinary — the grocery trolley. Growing up, I realized my mom was always the one pushing it, buying ingredients, and cooking dinner for the family every day. We often see dinner appear on the table without thinking about the effort behind it.\n\n So this piece is actually a small tribute to mothers — and to the quiet acts of care that happen in everyday life. It’s a reminder of family, gratitude, and the love behind a home-cooked meal.\n\n For me, the trolley is more like a symbol of that effort — whether it’s carrying bags, walking back home, or just the routine of getting ingredients for the family. So even if it’s not literally a trolley for everyone, it represents that moment before dinner — when someone goes out of their way to make sure there’s food on the table.',
        files:
          [{url:"img/groceries_01.png",caption:"001",type:"image"},
           {url:"img/groceries_02.png",caption:"002",type:"image"}]},
@@ -372,7 +384,42 @@
               {url:"img/WORK_003.png",caption:"003",type:"image"}]},
       {title:"Shaping Hearts 2026",description:"2026",
        tags:"self exploration",projectLink:"",
-       note:"",
+       note:`𝙋𝙞𝙥𝙚𝙡𝙞𝙣𝙚𝙨 𝙤𝙛 𝙋𝙡𝙖𝙮: The pipes symbolize connection pathways — representing communication, interaction, and shared experiences that occur through play. Just as pipes carry water to sustain life, play carries
+empathy, understanding, and joy between people. The vibrant colors represent diversity and individuality. Each color stands for a different personality, strength, or perspective. While they appear chaotic when viewed individually,
+together they create harmony and structure, reflecting how inclusive communities are formed
+not by uniformity, but by embracing differences.
+
+𝙃𝙚𝙖𝙧𝙩𝙮 𝙋𝙡𝙖𝙣𝙚𝙨: The heart in this piece is constructed from hundreds of individual paper planes, each representing a person, a story, or a moment of connection. Alone, each plane is small and
+fragile, but together they form something strong and meaningful — a collective heart. This reflects how communities are shaped through small interactions, shared laughter, and everyday moments of play.
+
+𝙎𝙢𝙖𝙡𝙡 𝙁𝙧𝙞𝙚𝙣𝙙, 𝘽𝙞𝙜 𝙃𝙚𝙖𝙧𝙩: Cats are often seen as quiet companions that provide comfort through presence
+rather than words. In many ways, they represent a form of connection that exists beyond
+language, much like play. Through simple interaction — watching, touching, or being near them
+— bonds are formed naturally and without expectation.
+
+The use of cardboard as a material reflects the spirit of play and creativity. Cardboard is a
+common material associated with childhood imagination, where simple objects can be
+transformed into meaningful creations. It represents how play does not depend on expensive
+tools, but on creativity and participation.
+
+𝘽𝙧𝙚𝙬𝙞𝙣𝙜 𝘾𝙤𝙣𝙣𝙚𝙘𝙩𝙞𝙤𝙣𝙨: This artwork explores how connection can happen in simple shared spaces. The
+illustration shows different animals relaxing together inside coffee cups, symbolizing individuals
+from different backgrounds and personalities coming together in a common environment.
+Despite their differences in appearance and nature, they share the same warm space
+peacefully.
+The coffee cup acts as a metaphor for a social space — a place where people gather, relax, and
+interact. Much like how cafés often become places for conversation and connection, the cups in
+this piece represent safe and welcoming environments where differences become less
+important than the experience of being together.
+
+𝙁𝙧𝙤𝙢 𝙏𝙧𝙖𝙣𝙨𝙞𝙩 𝙩𝙤 𝙏𝙤𝙜𝙚𝙩𝙝𝙚𝙧𝙣𝙚𝙨𝙨: This artwork explores how spaces can be transformed through community
+interaction and play. The abandoned bus, once a vehicle meant only for transportation, is
+reimagined as a gathering space where people can rest, interact, and connect. Covered with
+growing vines, the bus represents time, change, and renewal rather than decay.
+The transformation of the bus reflects how play and community participation can reshape
+environments. What was once a temporary space for movement becomes a permanent space
+for connection. This reflects the idea that meaningful places are not defined by their original
+purpose, but by how people choose to use them.`,
        files:[{url:"img/Shapingheart2026_001.png",caption:"Heart of pipes",type:"image"},
               {url:"img/Shapingheart2026_002.png",caption:"Heart of plane",type:"image"},
               {url:"img/Shapingheart2026_003.png",caption:"Cats",type:"image"}, 
