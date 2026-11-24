@@ -1,4 +1,4 @@
-  <!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -24,13 +24,7 @@
     .project-info p,.project-info h1{margin:0}
     .counter{font-size:11px;color:var(--muted);text-transform:uppercase}
     .current-title{font-size:clamp(34px,7vw,94px);line-height:.85;text-transform:uppercase;max-width:9ch}
-    .current-note{
-  width:min(360px,92vw);
-  font-size:13px;
-  line-height:1.35;
-  color:rgba(17,17,15,.72);
-  white-space:pre-line;
-}
+    .current-note{width:min(360px,92vw);font-size:13px;line-height:1.35;color:rgba(17,17,15,.72)}
     .controls{position:fixed;z-index:22;right:clamp(8px,1vw,14px);bottom:clamp(8px,1vw,14px);display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--line);border-radius:6px;background:var(--glass);backdrop-filter:blur(16px)}
     .icon-button,.mode-button{min-width:42px;height:42px;display:inline-grid;place-items:center;border-radius:4px;color:var(--muted);text-transform:uppercase;font-size:10px;transition:background .16s,color .16s}
     .mode-button{width:82px}
@@ -53,13 +47,7 @@
     .detail-media img,.detail-media video{max-width:100%;max-height:100%;object-fit:contain;display:block}
     .detail-caption{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:linear-gradient(0deg,rgba(17,17,15,.65),transparent);color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:.02em}
     .detail-body{padding:0 clamp(12px,2vw,28px) 48px;max-width:760px}
-    .detail-note{
-  font-size:14px;
-  line-height:1.6;
-  color:rgba(17,17,15,.72);
-  margin:0;
-  white-space:pre-line;
-}
+    .detail-note{font-size:14px;line-height:1.6;color:rgba(17,17,15,.72);margin:0}
     .detail-meta{font-size:11px;color:var(--muted);text-transform:uppercase;margin-top:12px}
     .detail-link{display:inline-block;margin-top:12px;font-size:12px;color:var(--ink);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--line);padding-bottom:2px;text-decoration:none}
     .lightbox{position:fixed;inset:0;z-index:60;background:rgba(17,17,15,.94);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;will-change:opacity}
@@ -98,6 +86,19 @@
     .admin-actions button{padding:8px 14px;border:1px solid var(--line);border-radius:4px;background:transparent;font:inherit;font-size:11px;text-transform:uppercase;cursor:pointer;letter-spacing:.02em}
     .admin-actions button.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
     .admin-actions button.danger{background:#b42318;color:#fff;border-color:#b42318}
+    .visibility-summary{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 14px;margin-bottom:16px;border:1px solid var(--line);border-radius:6px;font-size:12px;color:var(--muted)}
+    .visibility-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+    .visibility-state{font-size:10px;text-transform:uppercase;letter-spacing:.045em;color:#37644c;font-weight:bold}
+    .visibility-state.is-hidden{color:#77756e}
+    .visibility-toggle{padding:7px 10px;border:1px solid var(--line);border-radius:4px;background:var(--paper);white-space:nowrap;font-size:10px;text-transform:uppercase;letter-spacing:.025em;flex-shrink:0;cursor:pointer}
+    .visibility-toggle[aria-pressed="false"]{background:rgba(17,17,15,.07);color:var(--muted)}
+    .visibility-toggle:hover{border-color:var(--ink);color:var(--ink)}
+    .admin-card.project-hidden{border-style:dashed}
+    .admin-file-row.file-hidden{border-style:dashed;background:rgba(17,17,15,.06)}
+    .admin-file-row.file-hidden .admin-thumb{opacity:.42}
+    .admin-header-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .icon-button:disabled{opacity:.35;cursor:default}
+    @media(max-width:760px){.admin-file-row{flex-wrap:wrap}.admin-file-row input{min-width:100px}.admin-header{align-items:flex-start}.admin-header-actions{gap:4px}.admin-header-actions .admin-btn{padding:8px 10px}.visibility-head{flex-wrap:wrap}}
     .admin-trigger{position:fixed;bottom:68px;right:8px;z-index:30;padding:6px 10px;font-size:10px;text-transform:uppercase;color:var(--muted);background:transparent;border:0;cursor:pointer;opacity:.4;transition:opacity .2s}
     .admin-trigger:hover{opacity:1;color:var(--ink)}
     .upload-btn{font-size:10px;text-transform:uppercase;letter-spacing:.02em;padding:6px 10px;border:1px solid var(--line);border-radius:4px;background:rgba(17,17,15,.04);cursor:pointer;white-space:nowrap}
@@ -109,6 +110,7 @@
     @media(prefers-reduced-motion:reduce){.work,.index-panel,.about-panel,.icon-button,.mode-button,.project-detail,.admin-panel,.admin-modal,.lightbox,.admin-file-row{transition:none}}
   </style>
   <base target="_blank">
+<base target="_blank">
 </head>
 <body>
   <main class="site" aria-label="Portfolio carousel">
@@ -139,7 +141,8 @@
   <div class="admin-panel" id="adminPanel" aria-hidden="true">
     <div class="admin-header">
       <h2 style="margin:0;font-size:16px;text-transform:uppercase;">Project Admin</h2>
-      <div style="display:flex;gap:8px;">
+      <div class="admin-header-actions">
+        <button class="admin-btn secondary" style="margin:0;" id="exportPortfolioBtn" type="button">Export HTML</button>
         <button class="admin-btn" style="margin:0;" id="addProjectBtn" type="button">+ Add Project</button>
         <button class="admin-btn secondary" style="margin:0;" id="exitAdmin" type="button">Exit</button>
       </div>
@@ -220,8 +223,7 @@
     // ==================== PROJECT DATA ====================
     const DEFAULT_PROJECTS = [
       {title:"Groceries",description:"2025",tags:"Exhibition",
-       projectLink:"https://www.behance.net/gallery/245665945/Groceries",
-       note:`This artwork is inspired by something very ordinary — the grocery trolley. Growing up, I realized my mom was always the one pushing it, buying ingredients, and cooking dinner for the family every day. We often see dinner appear on the table without thinking about the effort behind it.\n\n So this piece is actually a small tribute to mothers — and to the quiet acts of care that happen in everyday life. It’s a reminder of family, gratitude, and the love behind a home-cooked meal.\n\n For me, the trolley is more like a symbol of that effort — whether it’s carrying bags, walking back home, or just the routine of getting ingredients for the family. So even if it’s not literally a trolley for everyone, it represents that moment before dinner — when someone goes out of their way to make sure there’s food on the table.`,
+       projectLink:"https://www.behance.net/gallery/245665945/Groceries",note:"",
        files:
          [{url:"img/groceries_01.png",caption:"001",type:"image"},
           {url:"img/groceries_02.png",caption:"002",type:"image"}]},
@@ -242,8 +244,7 @@
               {url:"video/loading_004.mp4",caption:"004",type:"video"}]},
       {title:"Blacklight Discovery",description:"2025-2026",tags:"IDENT, branding, concept",
        projectLink:"https://www.behance.net/gallery/250530941/Proj-BLACKLIGHT-DISCOVERY-A-TV-Channel-Branding",note:"TV channel Broadcast Branding",
-       files:[{url:"video/blacklight_001.mp4",caption:"001",type:"video"},
-              {url:"video/blacklight_002.mp4",caption:"002",type:"video"}]},
+       files:[{url:"video/blacklight_001.mp4",caption:"001",type:"video"}]},
       {title:"Art Installation",description:"2025-2026",tags:"digital installation, concept",
        projectLink:"https://www.artstation.com/sevenfour_heavenfall/albums/14538766",
        note:"My personal digital art gallery of different themes and my own feelings about the world interpreted into the art",
@@ -273,12 +274,6 @@
               {url:"img/poster_009.png",caption:"statues",type:"image"},
               {url:"img/poster_010.png",caption:"wrapped",type:"image"},
               {url:"img/poster_011.png",caption:"hotair ballon",type:"image"}]},
-       {title:"Chocolate Confectionary",description:"2026",tags:"graphic design, concept",
-      projectLink:"",
-       note:"For when things get sticky",
-       files:[{url:"img/Chocolate_001.png",caption:"ToiletRoller",type:"image"},
-              {url:"img/Chocolate_002.png",caption:"Soap",type:"image"},
-              {url:"img/Chocolate_003.png",caption:"ToothBrush",type:"image"}]},
       {title:"Archived",description:"2026",tags:"time, concept",
        projectLink:"https://www.artstation.com/sevenfour_heavenfall/albums/14859670",
        note:"Time in different concept",
@@ -287,12 +282,9 @@
               {url:"video/archived_003.mp4",caption:"paint",type:"video"},
               {url:"video/archived_004.mp4",caption:"signboard",type:"video"}]},
       {title:"Shortfilm",description:"2026",tags:"ai, film",projectLink:"",
-        projectLink:"https://vimeo.com/sevenfourheavenfall",
        note:"making digital shorts from my personal ideas",
        files:[{url:"video/shortfilm_001.mp4",caption:"depressed",type:"video"},
-              {url:"video/shortfilm_002.mp4",caption:"contact lens",type:"video"},
-              {url:"video/Haruki_001.mp4",caption:"Fashion ads",type:"video"},
-              {url:"video/shortfilm_003.mp4",caption:"Quiet Solitude",type:"video"}]},
+              {url:"video/shortfilm_002.mp4",caption:"contact lens",type:"video"}]},
       {title:"Isometric Room",description:"2026",tags:"concept, surreal",
        projectLink:"",
        note:"The hole are not windows",
@@ -328,7 +320,6 @@
        files:[{url:"img/northlight_001.png",caption:"001",type:"image"},
               {url:"img/northlight_002.png",caption:"002",type:"image"},
               {url:"img/northlight_003.png",caption:"003",type:"image"}]},
-      /* HIDDEN TEMPORARILY: Sunny Side Up — remove these comment markers to restore.
       {title:"Sunny Side Up",description:"2026",
        tags:"concept, branding, identity",
        projectLink:"https://www.behance.net/gallery/251939779/Proj-Sunny-Side-Up-Cleaning-A-Business-Branding",note:"A company offering services in the field of landscaping",
@@ -345,41 +336,18 @@
               {url:"img/sunnysideup_deck_11.png",caption:"011",type:"image"},
               {url:"img/sunnysideup_deck_12.png",caption:"012",type:"image"},
               {url:"img/sunnysideup_deck_13.png",caption:"013",type:"image"}]},
-      */
       {title:"String Lines Mess",description:"2026",tags:"abstract, coding",
        projectLink:"https://www.behance.net/gallery/250326311/String-Lines",
-       note:"Each line is one person: a single path, a single color. Alone, a string is just a string\n\the piece is built from overlap - the place where two strokes meet is where it actually happens.",
+       note:"Each line is one person: a single path, a single color",
        files:[{url:"img/stringmess_001.png",caption:"001",type:"image"},
               {url:"img/stringmess_002.png",caption:"002",type:"image"},
               {url:"img/stringmess_003.png",caption:"003",type:"image"},
               {url:"img/stringmess_004.png",caption:"004",type:"image"}]},
-      {title:"Unnecessary - Product Concept",description:"2026",tags:"3D, product, concept",
-       projectLink:"https://www.behance.net/gallery/253708055/UNNECSESSARY-Product-1-to-5",
-       note:"an internal part that escape the factory",
-       files:[{url:"img/Unnecessary_001.jpg",caption:"001",type:"image"},
-              {url:"img/Unnecessary_002.jpg",caption:"002",type:"image"},
-              {url:"img/Unnecessary_003.jpg",caption:"003",type:"image"},
-              {url:"img/Unnecessary_004.jpg",caption:"004",type:"image"},
-              {url:"img/Unnecessary_005.jpg",caption:"005",type:"image"},
-              {url:"img/Unnecessary_006.jpg",caption:"006",type:"image"}]},
-      {title:"Fall Through",description:"2026",tags:"Dream, Inspired",
-       projectLink:"",
-       note:"This artwork is inspired by my personal experience of having dreams within dreams. There are moments when I believe I have finally woken up, only to find myself trapped in another layer of the same dream. It becomes an endless cycle, where the boundary between being asleep and awake begins to blur. The stacked beds represent the different layers of my dreams. Each time I fall through one bed, I enter another dream, thinking that perhaps this time, I will finally wake up. Yet the deeper I fall, the further reality seems to drift away. Through this piece, I wanted to capture that strange feeling of being conscious, yet having no control over when I can wake up. It is both fascinating and unsettling, as something as familiar and comforting as a bed becomes a place of uncertainty..",
-       files:[{url:"img/FallThrough_001.png",caption:"001",type:"image"}]},
-      /* HIDDEN TEMPORARILY: Mono - Music Player — remove these comment markers to restore.
       {title:"Mono - Music Player",description:"2026",tags:"ai, coding",
        projectLink:"",
        note:"A custom original grid style music playlist created by vide coding",
        files:
          [{url:"video/mono_demo_001.mp4",caption:"demo",type:"video"}]},
-      */
-      /* HIDDEN TEMPORARILY: Missile Silo - Game — remove these comment markers to restore.
-      {title:"Missile Silo - Game",description:"2026",tags:"ai, coding",
-       projectLink:"",
-       note:"A retro recreation of missile command created by vide coding",
-       files:
-         [{url:"video/missilesilo_demo_001.mp4",caption:"demo",type:"video"}]},
-      */
       {title: "Eerie Found Footage", description: "2026", 
       tags: "ai, shorts", 
       projectLink: "https://www.behance.net/gallery/252529217/Machine-Withness-Found-Footage", 
@@ -392,71 +360,6 @@
               { url: "video/Foundfootage_005.mp4", caption: "room", type: "video" },
               { url: "video/Foundfootage_006.mp4", caption: "peekhole", type: "video" } 
     ] },
-      {title:"WORK",description:"2026",
-       tags:"concept, environment",
-       projectLink:"https://www.artstation.com/sevenfour_heavenfall/albums/698174",
-       note:"After work, pressure and feeling that everyday to just a loop",
-       files:[{url:"img/WORK_001.png",caption:"001",type:"image"},
-              {url:"img/WORK_002.png",caption:"002",type:"image"},
-              {url:"img/WORK_003.png",caption:"003",type:"image"}]},
-      {title:"Unseen",description:"2026",
-       tags:"mental health, environment, personal",
-       projectLink:"https://7delus.tumblr.com/post/830718377576235008/unseen-a-life-that-feels-too-heavy-in-a-world",
-       note:`Not everyone who is struggling will show it. Some people cry, some reach out for help, while others simply keep everything to themselves, hoping that someone might notice.
-
-This artwork is about depression, bullying, and the loneliness that comes with feeling like you don't belong anywhere.
-
-The little boy represents someone who has been hurt so many times that he no longer knows how to express what he's feeling. Around him are these huge concrete structures, making him look almost insignificant. I wanted to show how overwhelming life can feel, especially when you're young and don't really understand why the world can be so cruel.`,
-       files:[{url:"img/MentalHealth_001.png",caption:"001",type:"image"}]},
-      {title:"Shaping Hearts 2026",description:"2026",
-       tags:"self exploration",projectLink:"",
-       note:`Pipelines of Play: The pipes symbolize connection pathways ” representing communication, interaction, and shared experiences that occur through play. Just as pipes carry water to sustain life, play carries
-empathy, understanding, and joy between people. The vibrant colors represent diversity and individuality. Each color stands for a different personality, strength, or perspective. While they appear chaotic when viewed individually,
-together they create harmony and structure, reflecting how inclusive communities are formed
-not by uniformity, but by embracing differences.
-
-Hearty Plane: The heart in this piece is constructed from hundreds of individual paper planes, each representing a person, a story, or a moment of connection. Alone, each plane is small and
-fragile, but together they form something strong and meaningful ” a collective heart. This reflects how communities are shaped through small interactions, shared laughter, and everyday moments of play.
-
-Small Friend, Big Heart: Cats are often seen as quiet companions that provide comfort through presence
-rather than words. In many ways, they represent a form of connection that exists beyond
-language, much like play. Through simple interaction ” watching, touching, or being near them
-” bonds are formed naturally and without expectation.
-
-The use of cardboard as a material reflects the spirit of play and creativity. Cardboard is a
-common material associated with childhood imagination, where simple objects can be
-transformed into meaningful creations. It represents how play does not depend on expensive
-tools, but on creativity and participation.
-
-Brewing Connections: This artwork explores how connection can happen in simple shared spaces. The
-illustration shows different animals relaxing together inside coffee cups, symbolizing individuals
-from different backgrounds and personalities coming together in a common environment.
-Despite their differences in appearance and nature, they share the same warm space
-peacefully.
-The coffee cup acts as a metaphor for a social space ” a place where people gather, relax, and
-interact. Much like how cafÃ©s often become places for conversation and connection, the cups in
-this piece represent safe and welcoming environments where differences become less
-important than the experience of being together.
-
-From Transit To Togetherness: This artwork explores how spaces can be transformed through community
-interaction and play. The abandoned bus, once a vehicle meant only for transportation, is
-reimagined as a gathering space where people can rest, interact, and connect. Covered with
-growing vines, the bus represents time, change, and renewal rather than decay.
-The transformation of the bus reflects how play and community participation can reshape
-environments. What was once a temporary space for movement becomes a permanent space
-for connection. This reflects the idea that meaningful places are not defined by their original
-purpose, but by how people choose to use them.`,
-       files:[{url:"img/Shapingheart2026_001.png",caption:"Pipelines of Play",type:"image"},
-              {url:"img/Shapingheart2026_002.png",caption:"Hearty Plane",type:"image"},
-              {url:"img/Shapingheart2026_003.png",caption:"Small Friend, Big Heart",type:"image"}, 
-              {url:"img/Shapingheart2026_004.png",caption:"Brewing Connection",type:"image"}, 
-              {url:"img/Shapingheart2026_005.png",caption:" From Transit to Togetherness",type:"image"}]},
-      {title:"After Presence",description:"2026",
-       tags:"forsaken",projectLink:"",
-       note:"I can't fit into society",
-       files:[{url:"img/AfterPresence_001.png",caption:"Balloon",type:"image"},
-              {url:"img/AfterPresence_002.png",caption:"Cold Ice Cave",type:"image"},
-              {url:"img/AfterPresence_003.png",caption:" Stranger step into my space",type:"image"}]},
       {title:"Personal Drawing",description:"2025-2026",
        tags:"art therapy",projectLink:"",
        note:"Carefree drawing",
@@ -471,8 +374,11 @@ purpose, but by how people choose to use them.`,
               {url:"img/personal_drawing_009.png",caption:"Forest Monster",type:"image"}]}
     ];
 
+    const PUBLISHED_REVISION = "";
+
     // ==================== STATE ====================
-    let projects = [];
+    let projects = []; // Complete admin data, including hidden items
+    let visibleProjects = []; // Public carousel data only
     let active = 0;
     let dragStart = null;
     let wheelLock = false;
@@ -526,8 +432,8 @@ purpose, but by how people choose to use them.`,
     }, { root: carousel, threshold: 0.1 });
 
     // ==================== PERSISTENCE ====================
-    const STORAGE_KEY = 'portfolio_projects_v13';
-    const DEFAULTS_HASH = DEFAULT_PROJECTS.map(p => p.title).join('|');
+    const STORAGE_KEY = 'portfolio_projects_v11';
+    const DEFAULTS_HASH = DEFAULT_PROJECTS.map(p => p.title).join('|') + (PUBLISHED_REVISION ? '|published:' + PUBLISHED_REVISION : '');
 
     function loadProjects() {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -543,11 +449,17 @@ purpose, but by how people choose to use them.`,
       }
     }
 
-    const saveProjects = debounce(() => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
-      localStorage.setItem(STORAGE_KEY + '_hash', DEFAULTS_HASH);
-      log('Saved ' + projects.length + ' projects');
-    }, 300);
+    function persistProjects() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+        localStorage.setItem(STORAGE_KEY + '_hash', DEFAULTS_HASH);
+        log('Saved ' + projects.length + ' projects');
+      } catch (err) {
+        console.warn('Could not save portfolio locally:', err);
+        if (isAdmin) alert('Browser storage is unavailable or full. Export HTML to keep your changes.');
+      }
+    }
+    const saveProjects = debounce(persistProjects, 300);
 
     // ==================== IMAGE/VIDEO PROCESSING ====================
     function resizeImage(file, maxWidth = 1400, quality = 0.82) {
@@ -597,7 +509,7 @@ purpose, but by how people choose to use them.`,
     // ==================== HELPERS ====================
     function pad(v) { return String(v).padStart(2, "0"); }
     function shortestOffset(i) {
-      const t = projects.length;
+      const t = visibleProjects.length;
       let o = i - active;
       if (o > t / 2) o -= t;
       if (o < -t / 2) o += t;
@@ -692,17 +604,25 @@ purpose, but by how people choose to use them.`,
 
     // ==================== RENDERING (BATCHED WITH RAF) ====================
     function render() {
-      log('render() called, projects=' + projects.length);
-      // Use DocumentFragment for batch DOM insertion
+      const previous = visibleProjects[active]?.source;
+      visibleProjects = projects.filter(p => p.visible !== false && (p.files || []).some(f => f.visible !== false))
+        .map(p => ({ ...p, source: p, files: (p.files || []).filter(f => f.visible !== false) }));
+      const retainedIndex = visibleProjects.findIndex(p => p.source === previous);
+      active = retainedIndex >= 0 ? retainedIndex : Math.max(0, Math.min(active, visibleProjects.length - 1));
+      if (currentLightbox) closeLightbox();
+      if (projectDetail.classList.contains('is-open')) closeDetail();
+      videoObserver.disconnect();
+      carousel.querySelectorAll('video').forEach(v => v.pause());
+      log('render() called, visible projects=' + visibleProjects.length);
       const frag = document.createDocumentFragment();
-      projects.forEach((p, i) => {
+      visibleProjects.forEach((p, i) => {
         frag.appendChild(buildWorkCard(p, i));
       });
       carousel.innerHTML = '';
       carousel.appendChild(frag);
 
       // Build index panel as string (faster than DOM for static content)
-      indexPanel.innerHTML = projects.map((p, i) => {
+      indexPanel.innerHTML = visibleProjects.map((p, i) => {
         const f = p.files && p.files[0];
         let thumbHtml;
         if (f && isVideo(f)) {
@@ -713,7 +633,9 @@ purpose, but by how people choose to use them.`,
           thumbHtml = '<img class="index-thumb" src="' + thumbUrl(p) + '" alt="" loading="lazy" decoding="async">';
         }
         return '<button class="index-row" type="button" data-index="' + i + '" aria-current="false">' + thumbHtml + '<span>' + p.title + '<br><span style="color:var(--muted)">' + p.tags + '</span></span><span>' + p.description.substring(0, 12) + '...</span></button>';
-      }).join('');
+      }).join('') || '<p style="padding:18px;color:var(--muted);font-size:12px">No visible projects.</p>';
+      document.querySelector('#prevButton').disabled = visibleProjects.length < 2;
+      document.querySelector('#nextButton').disabled = visibleProjects.length < 2;
 
       indexPanel.querySelectorAll('.index-row').forEach(r => {
         r.addEventListener('click', () => { goTo(Number(r.dataset.index)); setIndex(false); });
@@ -753,10 +675,10 @@ purpose, but by how people choose to use them.`,
         card.style.zIndex = 100 - a;
       }
 
-      const p = projects[active] || {};
-      currentTitle.textContent = p.title || '';
-      currentNote.textContent = p.note || '';
-      counter.textContent = pad(active + 1) + ' / ' + pad(projects.length) + ' -- ' + (p.tags || '');
+      const p = visibleProjects[active];
+      currentTitle.textContent = p ? p.title : 'No projects';
+      currentNote.textContent = p ? (p.note || '') : 'There are no visible projects at the moment.';
+      counter.textContent = p ? pad(active + 1) + ' / ' + pad(visibleProjects.length) + ' -- ' + (p.tags || '') : '00 / 00';
 
       const rows = indexPanel.querySelectorAll('.index-row');
       for (let i = 0; i < rows.length; i++) {
@@ -765,8 +687,9 @@ purpose, but by how people choose to use them.`,
     }
 
     function goTo(i) {
+      if (!visibleProjects.length) return;
       const prev = active;
-      active = (i + projects.length) % projects.length;
+      active = ((i % visibleProjects.length) + visibleProjects.length) % visibleProjects.length;
       if (prev !== active) {
         // Update video lazy loading when slide changes
         updateVideoLazyLoading();
@@ -801,7 +724,7 @@ purpose, but by how people choose to use them.`,
 
     // ==================== DETAIL / LIGHTBOX ====================
     function openDetail(i) {
-      const p = projects[i];
+      const p = visibleProjects[i];
       if (!p) return;
       detailTitle.textContent = p.title;
       detailMeta.textContent = (p.tags || '') + ' - ' + (p.description || '').substring(0, 60) + (p.description && p.description.length > 60 ? '...' : '');
@@ -835,7 +758,7 @@ purpose, but by how people choose to use them.`,
     }
 
     function openLightbox(projIdx, fileIdx) {
-      const p = projects[projIdx]; if (!p) return;
+      const p = visibleProjects[projIdx]; if (!p) return;
       const f = p.files[fileIdx]; if (!f) return;
       currentLightbox = { projIdx, fileIdx };
       const type = getFileType(f);
@@ -858,7 +781,8 @@ purpose, but by how people choose to use them.`,
 
     function lightboxPrev() {
       if (!currentLightbox) return;
-      const p = projects[currentLightbox.projIdx];
+      const p = visibleProjects[currentLightbox.projIdx];
+      if (!p || !p.files.length) return;
       let fi = currentLightbox.fileIdx - 1;
       if (fi < 0) fi = p.files.length - 1;
       openLightbox(currentLightbox.projIdx, fi);
@@ -866,7 +790,8 @@ purpose, but by how people choose to use them.`,
 
     function lightboxNext() {
       if (!currentLightbox) return;
-      const p = projects[currentLightbox.projIdx];
+      const p = visibleProjects[currentLightbox.projIdx];
+      if (!p || !p.files.length) return;
       let fi = currentLightbox.fileIdx + 1;
       if (fi >= p.files.length) fi = 0;
       openLightbox(currentLightbox.projIdx, fi);
@@ -912,11 +837,12 @@ purpose, but by how people choose to use them.`,
         const isOnlyPlaceholder = projFiles.length === 1 && projFiles[0].url === 'img/placeholder.jpg';
 
         if (pendingUpload.action === 'new') {
-          if (isOnlyPlaceholder) { projects[projIdx].files = [payload]; }
+          if (isOnlyPlaceholder) { projects[projIdx].files = [{ ...payload, visible: projFiles[0].visible !== false }]; }
           else { projects[projIdx].files.push(payload); }
         } else {
           const oldCap = projects[projIdx].files[pendingUpload.fileIdx].caption || '';
-          projects[projIdx].files[pendingUpload.fileIdx] = { ...payload, caption: oldCap };
+          const oldFile = projects[projIdx].files[pendingUpload.fileIdx];
+          projects[projIdx].files[pendingUpload.fileIdx] = { ...payload, caption: oldCap, visible: oldFile.visible !== false };
         }
 
         saveProjects(); renderAdmin(); render();
@@ -971,19 +897,23 @@ purpose, but by how people choose to use them.`,
 
     // ==================== ADMIN RENDER ====================
     function renderAdmin() {
-      const frag = document.createDocumentFragment();
-      // Build as string for performance
-      adminContent.innerHTML = projects.map((p, i) => {
+      const publicCount = projects.filter(p => p.visible !== false && (p.files || []).some(f => f.visible !== false)).length;
+      adminContent.innerHTML = '<div class="visibility-summary"><strong>' + publicCount + ' / ' + projects.length + ' projects visible</strong><span>Changes save in this browser. Export HTML to publish them.</span></div>' + projects.map((p, i) => {
+        const shown = p.visible !== false;
+        const totalFiles = (p.files || []).length;
+        const shownFiles = (p.files || []).filter(f => f.visible !== false).length;
+        const state = !shown ? 'Hidden project' : !shownFiles ? 'Hidden — no visible media' : 'Visible project';
         const filesHtml = (p.files || []).map((f, fi) => {
           const type = getFileType(f);
           const thumb = type === 'video' ? (f.poster ? '<img class="admin-thumb" src="' + f.poster + '">' : '<div class="admin-thumb" style="display:flex;align-items:center;justify-content:center;background:#111;color:#fff;font-size:8px;text-transform:uppercase;letter-spacing:.05em;">Video</div>') : '<img class="admin-thumb" src="' + f.url + '">';
-          return '<div class="admin-file-row" draggable="true" data-proj="' + i + '" data-fileindex="' + fi + '"><span class="drag-handle">&#9776;</span>' + thumb + '<input type="text" data-proj="' + i + '" data-file="' + fi + '" data-field="url" value="' + f.url + '" placeholder="Image URL or base64"><button type="button" class="upload-btn upload-replace" data-proj="' + i + '" data-file="' + fi + '">Upload</button><input type="text" data-proj="' + i + '" data-file="' + fi + '" data-field="caption" value="' + (f.caption || '') + '" placeholder="Caption"><button type="button" class="remove-file" data-proj="' + i + '" data-file="' + fi + '">Remove</button></div>';
+          const fileShown = f.visible !== false;
+          return '<div class="admin-file-row' + (fileShown ? '' : ' file-hidden') + '" draggable="true" data-proj="' + i + '" data-fileindex="' + fi + '"><span class="drag-handle">&#9776;</span>' + thumb + '<input type="text" data-proj="' + i + '" data-file="' + fi + '" data-field="url" value="' + f.url + '" placeholder="Image URL or base64"><button type="button" class="upload-btn upload-replace" data-proj="' + i + '" data-file="' + fi + '">Upload</button><input type="text" data-proj="' + i + '" data-file="' + fi + '" data-field="caption" value="' + (f.caption || '') + '" placeholder="Caption"><button type="button" class="visibility-toggle toggle-file" data-proj="' + i + '" data-file="' + fi + '" aria-label="Show media in portfolio" aria-pressed="' + fileShown + '">' + (fileShown ? 'Hide' : 'Show') + '</button><button type="button" class="remove-file" data-proj="' + i + '" data-file="' + fi + '">Remove</button></div>';
         }).join('');
-        return '<div class="admin-card" data-index="' + i + '"><div class="admin-field"><label>Title</label><input type="text" data-proj="' + i + '" data-field="title" value="' + p.title + '"></div><div class="admin-field"><label>Description</label><textarea data-proj="' + i + '" data-field="description">' + (p.description || '') + '</textarea></div><div class="admin-field"><label>Tags</label><input type="text" data-proj="' + i + '" data-field="tags" value="' + (p.tags || '') + '"></div><div class="admin-field"><label>Project Link</label><input type="text" data-proj="' + i + '" data-field="projectLink" value="' + (p.projectLink || '') + '"></div><div class="admin-field"><label>Note</label><textarea data-proj="' + i + '" data-field="note">' + (p.note || '') + '</textarea></div><label style="font-size:10px;text-transform:uppercase;color:var(--muted);letter-spacing:.04em;">Files (drag to reorder)</label><div class="admin-files" id="files-' + i + '">' + filesHtml + '</div><div class="admin-actions"><button type="button" class="upload-btn upload-new" data-proj="' + i + '">Upload Image / Video</button><button type="button" class="add-file" data-proj="' + i + '">+ Add URL</button><button type="button" class="primary save-proj" data-proj="' + i + '">Save Project</button><button type="button" class="danger delete-proj" data-proj="' + i + '">Delete Project</button></div></div>';
+        return '<div class="admin-card' + (shown && shownFiles ? '' : ' project-hidden') + '" data-index="' + i + '"><div class="visibility-head"><div><div class="visibility-state' + (shown && shownFiles ? '' : ' is-hidden') + '">' + state + '</div><div style="font-size:11px;color:var(--muted);margin-top:4px">' + shownFiles + ' / ' + totalFiles + ' media visible</div></div><button type="button" class="visibility-toggle toggle-project" data-proj="' + i + '" aria-label="Show project in portfolio" aria-pressed="' + shown + '">' + (shown ? 'Hide project' : 'Show project') + '</button></div><div class="admin-field"><label>Title</label><input type="text" data-proj="' + i + '" data-field="title" value="' + p.title + '"></div><div class="admin-field"><label>Description</label><textarea data-proj="' + i + '" data-field="description">' + (p.description || '') + '</textarea></div><div class="admin-field"><label>Tags</label><input type="text" data-proj="' + i + '" data-field="tags" value="' + (p.tags || '') + '"></div><div class="admin-field"><label>Project Link</label><input type="text" data-proj="' + i + '" data-field="projectLink" value="' + (p.projectLink || '') + '"></div><div class="admin-field"><label>Note</label><textarea data-proj="' + i + '" data-field="note">' + (p.note || '') + '</textarea></div><label style="font-size:10px;text-transform:uppercase;color:var(--muted);letter-spacing:.04em;">Files (drag to reorder)</label><div class="admin-files" id="files-' + i + '">' + filesHtml + '</div><div class="admin-actions"><button type="button" class="upload-btn upload-new" data-proj="' + i + '">Upload Image / Video</button><button type="button" class="add-file" data-proj="' + i + '">+ Add URL</button><button type="button" class="primary save-proj" data-proj="' + i + '">Save Project</button><button type="button" class="danger delete-proj" data-proj="' + i + '">Delete Project</button></div></div>';
       }).join('');
 
       // Event delegation for better performance
-      adminContent.addEventListener('change', (e) => {
+      adminContent.onchange = (e) => {
         const target = e.target;
         if (!target.dataset.proj) return;
         const projIdx = Number(target.dataset.proj);
@@ -995,14 +925,25 @@ purpose, but by how people choose to use them.`,
           projects[projIdx][field] = target.value;
         }
         saveProjects(); render(); scheduleUpdate();
-      });
+      };
 
-      adminContent.addEventListener('click', (e) => {
+      adminContent.onclick = (e) => {
         const btn = e.target.closest('button');
         if (!btn) return;
         const projIdx = Number(btn.dataset.proj);
 
-        if (btn.classList.contains('upload-replace')) {
+        if (btn.classList.contains('toggle-project')) {
+          const p = projects[projIdx];
+          p.visible = p.visible === false;
+          persistProjects(); render(); renderAdmin();
+          adminContent.querySelector('.toggle-project[data-proj="' + projIdx + '"]')?.focus({preventScroll:true});
+        } else if (btn.classList.contains('toggle-file')) {
+          const fi = Number(btn.dataset.file);
+          const f = projects[projIdx].files[fi];
+          f.visible = f.visible === false;
+          persistProjects(); render(); renderAdmin();
+          adminContent.querySelector('.toggle-file[data-proj="' + projIdx + '"][data-file="' + fi + '"]')?.focus({preventScroll:true});
+        } else if (btn.classList.contains('upload-replace')) {
           pendingUpload = { projIdx, fileIdx: Number(btn.dataset.file) };
           createFileInput().click();
         } else if (btn.classList.contains('upload-new')) {
@@ -1033,11 +974,9 @@ purpose, but by how people choose to use them.`,
           const idx = Number(btn.dataset.proj);
           if (!confirm('Delete "' + projects[idx].title + '"?')) return;
           projects.splice(idx, 1);
-          if (active >= projects.length) active = projects.length - 1;
-          if (active < 0) active = 0;
           saveProjects(); renderAdmin(); render(); scheduleUpdate();
         }
-      });
+      };
 
       // Drag events
       adminContent.querySelectorAll('.admin-file-row').forEach(row => {
@@ -1062,7 +1001,7 @@ purpose, but by how people choose to use them.`,
     document.querySelector('#exitAdmin').addEventListener('click', exitAdmin);
     document.querySelector('#addProjectBtn').addEventListener('click', () => {
       projects.push({ title: "New Project", description: "Short description", tags: "Tags", projectLink: "https://example.com", note: "Full description", files: [{ url: "img/placeholder.jpg", caption: "", type: "image" }] });
-      saveProjects(); renderAdmin(); render(); goTo(projects.length - 1);
+      saveProjects(); renderAdmin(); render(); goTo(visibleProjects.length - 1);
     });
     adminPassword.addEventListener('keydown', e => { if (e.key === 'Enter') enterAdmin(); });
 
@@ -1113,8 +1052,29 @@ purpose, but by how people choose to use them.`,
     // Throttled resize
     window.addEventListener('resize', throttle(() => {
       if (rafId) cAF(rafId);
+      pendingUpdate = false;
       scheduleUpdate();
     }, 100));
+
+    // ==================== PUBLISH / EXPORT ====================
+    // Capture the original document before the dynamic portfolio is rendered.
+    const sourceHTML = '<!doctype html>\n' + document.documentElement.outerHTML;
+    function exportPortfolio() {
+      const startMarker = '// ==================== PROJECT DATA ====================';
+      const endMarker = '// ==================== STATE ====================';
+      const start = sourceHTML.indexOf(startMarker);
+      const end = sourceHTML.indexOf(endMarker, start);
+      if (start < 0 || end < 0) { alert('Could not export portfolio source.'); return; }
+      const data = JSON.stringify(projects, null, 2).replace(/</g, '\\u003c');
+      const revision = JSON.stringify(String(Date.now()));
+      const html = sourceHTML.slice(0, start) + startMarker + '\n    const DEFAULT_PROJECTS = ' + data + ';\n    const PUBLISHED_REVISION = ' + revision + ';\n\n    ' + sourceHTML.slice(end);
+      const url = URL.createObjectURL(new Blob([html], {type:'text/html;charset=utf-8'}));
+      const a = document.createElement('a');
+      a.href = url; a.download = 'index.html'; a.target = '_self';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    }
+    document.querySelector('#exportPortfolioBtn').addEventListener('click', exportPortfolio);
 
     // ==================== INIT ====================
     createFileInput();
